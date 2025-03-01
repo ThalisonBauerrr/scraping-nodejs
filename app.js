@@ -22,10 +22,7 @@ app.get('/', (req, res) => {
   res.render('index');  // Renderiza o arquivo index.ejs da pasta views
 });
 
-// Rota para a página "EM BREVE"
-app.get('/embreve', (req, res) => {
-  res.render('embreve');  // Renderiza o arquivo embreve.ejs (você pode criar esse arquivo)
-});
+
 
 // Inicia o servidor e escuta na porta especificada
 app.listen(port, () => {
