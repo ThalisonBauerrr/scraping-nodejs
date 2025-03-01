@@ -304,7 +304,7 @@ class BlazeService {
     
                         // Converte a string 'sequence' para número inteiro
                         const requiredRoundsWithoutWhite = parseInt(activeStrategy.sequence, 10);
-    
+                        const lastDoubleColor = colorMap[currentDouble.color];
                         // Verifica se a quantidade de rodadas sem branco é maior ou igual ao valor de sequence na estratégia
                         if(strategyMode === 1){
                             if (no_white >= requiredRoundsWithoutWhite) {
