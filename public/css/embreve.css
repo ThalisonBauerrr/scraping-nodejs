@@ -19,13 +19,13 @@ body {
 
 /* Estilo do título "EM BREVE" */
 h1 {
-    font-size: 3rem;
-    color: #333;
+    font-size: 6rem;
+    color: #dadada;
     margin-bottom: 20px;
 }
 
 /* Estilo para o logo */
 .logo {
-    max-width: 200px; /* Tamanho máximo do logo */
+    max-width: 400px; /* Tamanho máximo do logo */
     max-height: 200px;
 }
