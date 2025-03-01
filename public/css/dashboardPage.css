@@ -1,0 +1,5 @@
+#doublesContainer {
+    display: flex; /* Alinha os itens lado a lado */
+    gap: 8px; /* Adiciona um espaço entre as imagens */
+    flex-wrap: wrap; /* Quebra para a linha seguinte se necessário */
+}

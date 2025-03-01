@@ -1,0 +1,125 @@
+.icons {
+    display: flex;
+    align-items: center;
+    margin: 0 32px;
+}
+
+/* 🔹 Estilizando o dropdown */
+.dropdown {
+    position: relative;
+    display: inline-block;
+}
+
+/* 🔹 O menu suspenso (inicialmente escondido) */
+.dropdown-menu {
+    display: none;
+    position: absolute;
+    top: 40px; /* Ajuste conforme necessário */
+    right: 0;
+    background-color: #fff;
+    border-radius: 5px;
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+    width: 160px; /* Ajustado para acomodar os ícones */
+    z-index: 1000;
+    overflow: hidden; /* Evita bordas estranhas ao aplicar hover */
+}
+
+/* 🔹 Estilo para os itens do menu */
+.dropdown-menu ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.dropdown-menu li {
+    display: flex;
+    align-items: center;
+    padding: 10px;
+    cursor: pointer;
+    transition: background 0.3s ease-in-out;
+}
+
+/* 🔹 Ícones dentro dos itens */
+.dropdown-menu li img {
+    width: 21px; /* Tamanho do ícone */
+    height: 21px;
+    margin-left: 6px;
+    margin-right: 10px;
+    opacity: 0.8;
+    transition: opacity 0.3s ease-in-out;
+}
+
+/* 🔹 Links dentro do menu */
+.dropdown-menu li a {
+    text-decoration: none;
+    color: #333;
+    font-size: 13px;
+    flex-grow: 1; /* Garante que o link ocupe o espaço necessário */
+}
+
+/* 🔹 Efeito hover: fundo cinza claro + texto vermelho */
+.dropdown-menu li:hover {
+    background-color: #f5f5f5; /* Cinza claro */
+}
+
+.dropdown-menu li:hover a {
+    color: #e1003c; /* Vermelho */
+    font-weight: bold;
+}
+
+/* 🔹 Ícone no hover fica mais destacado */
+.dropdown-menu li:hover img {
+    opacity: 1;
+}
+
+/* 🔹 Mostra o menu quando a classe 'active' for adicionada */
+.dropdown-menu.active {
+    display: block;
+}
+
+/* 🔹 Fundo do modal de assinatura com efeito de desfoque */
+.hiddenContentss
+{
+    min-width: 800px
+}
+.subscription-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5); /* Fundo escuro */
+    backdrop-filter: blur(5px); /* Efeito de desfoque */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1001;
+
+    /* 🔹 Mantém escondido ao carregar */
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s ease-in-out, visibility 0.3s ease-in-out;
+}
+
+/* 🔹 Mostra o modal quando ativo */
+.subscription-modal.active {
+    opacity: 1;
+    visibility: visible;
+}
+/* 🔹 Conteúdo do modal */
+.subscription-modal-content {
+    background: #fff;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+    text-align: center;
+    min-width: 700px;
+    position: relative;
+}
+
+
+.close-btn:hover,
+.close-btn:focus {
+    color: black;
+    text-decoration: none;
+}

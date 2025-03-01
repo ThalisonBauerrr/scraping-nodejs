@@ -1,0 +1,83 @@
+<link rel="stylesheet" href="/css/header.css">
+<script src="/js/header.js"></script> <!-- Script global -->
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const userDropdown = document.getElementById("userDropdown");
+        const dropdownMenu = document.getElementById("dropdownMenu");
+    
+        userDropdown.addEventListener("click", function (event) {
+            event.preventDefault(); // Impede a navegação do link
+            dropdownMenu.classList.toggle("active"); // Alterna a exibição do menu
+        });
+    
+        // Fecha o menu ao clicar fora dele
+        document.addEventListener("click", function (event) {
+            if (!userDropdown.contains(event.target) && !dropdownMenu.contains(event.target)) {
+                dropdownMenu.classList.remove("active");
+            }
+        });
+    });
+    </script>
+<div id="header">
+    <div class="left mobile-left">
+        <div class="content-first">
+            <div class="left-bar-action">
+                <img alt="" style="width: 20px;" src="/img/menu.svg">
+            </div>
+            <a aria-current="page" class="active" target="_self" id="logo" href="/"><img class="main" src="/img/logo.svg"></a>
+        </div>
+
+    </div>
+    <div class="right">
+        <div class="content">
+            <div class="subcategory-row">
+                <div class="subcategory-col">
+                    <a href="/strategies" class="subcategory css-12nkkfl">
+                        <img src="/img/icons8-objetivo-24.png">
+                        Estratégias</a>
+                </div>
+                <div class="subcategory-col">
+                    <a href="/start" class="subcategory css-12nkkfl">
+                        <img src="/img/icons8-start-24.png">
+                        Jogar</a>
+                </div>
+            </div>
+            
+
+                <div class="routes">
+                     <!-- 🔹 Exibe botões de login/cadastro apenas se o usuário NÃO estiver logado -->
+                <% if (!user) { %>
+                    <div class="unauthed-buttons">
+                        <div><a href="/login" class="link">Entrar</a></div>
+                        <div><button class="red sign-up">Cadastre-se</button></div>
+                    </div>
+                <% } else { %>
+                    <!-- 🔹 Exibe nome do usuário quando logado -->
+                    <div class="account">
+                        <div class="icons">
+                            <div class="notice"></div>
+                            <div class="dropdown">
+                                <a href="#" class="dropdown__trigger" id="userDropdown">
+                                    <div class="user">
+                                        <img alt="Usuário" src="/img/icons8-user-24.png">
+                                    </div>
+                                </a>
+                                <div class="dropdown-menu" id="dropdownMenu">
+                                    <ul>
+                                        <li><img src="/img/icons8-user-24.png"><a href="/profile">Conta</a></li>
+                                        <li><img src="/img/icons8-digital-signature-24.png" alt=""><a >Assinatura</a></li>
+                                        <li><img src="/img/icons8-settings-24.png" alt=""><a href="#">Preferências</a></li>
+                                        <li><img src="/img/icons8-support-30.png" alt=""><a href="#">Suporte</a></li>
+                                        <li style="border-top:1px solid #BCBFC7"><img src="/img/icons8-logout-24.png" alt=""><a href="/logout">Sair</a></li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                <% } %>
+                </div>
+        </div>
+    </div>
+</div>
+<script src="/js/header.js"></script> <!-- Script global -->
+

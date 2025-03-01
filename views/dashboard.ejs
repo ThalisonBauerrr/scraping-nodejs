@@ -1,0 +1,61 @@
+<!-- views/login.ejs -->
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>LethalCode - Home</title>
+    <link rel="stylesheet" href="/css/dashboard.css">
+    <link rel="stylesheet" href="/css/dashboardPage.css">
+    <link rel="stylesheet" href="/css/botoes.css">
+    <link rel="stylesheet" href="/css/startPage.css">
+    <link rel="stylesheet" href="/font/font.css">
+     <!-- Caminho para o seu arquivo de estilo -->
+      <style>
+            iframe {
+                overflow: hidden; /* Esconde barras de rolagem */
+                border: none; /* Remove borda */
+                
+            }   
+      </style>
+</head>
+
+<body>
+    <script>
+        document.getElementById("blazeIframe").onload = function() {
+            const iframe = document.getElementById("blazeIframe").contentWindow;
+            iframe.document.body.style.overflow = "hidden"; // Tenta ocultar a rolagem
+        };
+    </script>
+     <!-- aqui enseri header -->
+     <%- include('partials/header') %>
+     <div class="principal">
+          
+        <div id="leftbar"></div>
+        <div id="page-container">
+          <h2>Últimos números sorteados...</h2>
+          <div id="doublesContainer">
+               <!-- Exemplo de adição de imagens com base na cor -->
+               <img src="/img/white.png" alt="Cor 0">
+               <img src="/img/red.png" alt="Cor 1">
+               <img src="/img/black.png" alt="Cor 2">
+           </div>    
+           <div style="width: 1000px; height: 500px; overflow: hidden; position: relative;">
+                <iframe id="blazeIframe" 
+                    src="http://localhost:3000/blaze-content" 
+                    width="1000px" 
+                    height="500px" 
+                    scrolling="no"
+                    style="border: none;">
+                </iframe>
+            </div>
+        
+        </div>
+    </div>
+ <!-- Incluindo o JavaScript -->
+ <script src="/js/startPage.js"></script> <!-- Script global -->
+ <script src="/js/dashboardPage.js"></script> <!-- Script global -->
+</body>
+</html>
+
+
+

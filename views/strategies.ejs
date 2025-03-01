@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>LethalCode</title>
+    <link rel="stylesheet" href="/css/dashboard.css">
+    <link rel="stylesheet" href="/css/botoes.css">
+    <link rel="stylesheet" href="/css/strategiePage.css">
+    <link rel="stylesheet" href="/font/font.css">
+</head>
+
+<body>
+
+    <!-- Inclui o cabeçalho -->
+    <%- include('partials/header') %>
+
+    <div class="principal">
+        <div id="leftbar"></div>
+        <div id="page-container">
+            <div class="menu-container">
+                <button id="btnAddStrategy" class="red sign-up">Adicionar Estratégia</button>
+                <div id="menu" class="menu">
+                    <a href="#" id="openAddModal"><span>Estratégia VERMELHO/PRETO</span></a>
+                    <a href="#"><span>Estratégia BRANCO</span></a>
+                </div>
+            </div>
+
+            <% strategies.forEach(strategy => { %>
+                <div class="strategies" data-strategy-id="<%= strategy.id %>">
+                    <span style="align-items: center;">
+                        <h3><%= strategy.name %> : Padrão <%= JSON.parse(strategy.sequence).length %> cores</h3>
+                        <img class="toggleImage"
+                             style="width: 30px; height: 30px; cursor: pointer;"
+                             src="<%= strategy.status === 'active' ? '/img/icons8-on-48.png' : '/img/icons8-off-48.png' %>"
+                             alt="Imagem"
+                             onclick="changeImage(this, '<%= strategy.id %>')">
+                    </span>
+
+                    <span>
+                        <!-- Exibir as cores escolhidas para apostar -->
+                        <div class="cor-aposta">
+                            <div class="chosen-colors">
+                                <% let chosenColors = [];
+                                   try { chosenColors = JSON.parse(strategy.chosen_color);
+                                         if (!Array.isArray(chosenColors)) chosenColors = [chosenColors];
+                                   } catch (e) { chosenColors = [strategy.chosen_color]; }
+                                %>
+
+                                <% chosenColors.forEach(color => { %>
+                                    <% if (color === "white") { %>
+                                        <div class="sm-box white shadow">
+                                            <img class="zero-img" src="/img/white.png">
+                                        </div>
+                                    <% } else { %>
+                                        <div class="sm-box <%= color %>">
+                                            <div class="number"><span></span></div>
+                                        </div>
+                                    <% } %>
+                                <% }) %>
+                            </div>
+                            <p class="apostar-no">APOSTAR</p>
+                        </div>
+
+                        <!-- Exibir a sequência de apostas -->
+                        <div class="sequence bordered-box">
+                            <% JSON.parse(strategy.sequence).forEach(color => { %>
+                                <% if (color === "white") { %>
+                                    <div class="sm-box white shadow">
+                                        <img class="zero-img" src="/img/white.png">
+                                    </div>
+                                <% } else { %>
+                                    <div class="sm-box <%= color %>">
+                                        <div class="number"><span></span></div>
+                                    </div>
+                                <% } %>
+                            <% }) %>
+                            <p class="box-label">SEQUÊNCIA</p>
+                        </div>
+                    </span>
+
+                    <!-- Botões de ação -->
+                    <div class="btn_estrategies" style="display: flex; gap: 10px;">
+                        <span id="openEditModal">
+                            <img src="/img/icons8-edit-24.png" alt="">Editar
+                        </span>
+                        <span>|</span>
+                        <span class="delete-strategy">
+                            <img src="/img/icons8-delete-24.png" alt="">Remover
+                        </span>
+                    </div>
+                </div>
+            <% }) %>
+        </div>
+
+        <!-- Modal para editar a estratégia -->
+        <div id="editModal" class="modal">
+            <div class="modal-content">
+                <span id="closeEditModal" class="close-btn">&times;</span>
+                <%- include('partials/editStrategie') %>
+            </div>
+        </div>
+
+        <!-- Modal para adicionar a estratégia -->
+        <div id="addModal" class="modal">
+            <div class="modal-content">
+                <span id="closeAddModal" class="close-btn">&times;</span>
+                <%- include('partials/addStrategie') %>
+            </div>
+        </div>
+
+        <!-- Modal de Confirmação para Remover Estratégia -->
+        <div id="confirmationModal" class="confirmation-modal" style="display:none;">
+            <div class="confirmation-content">
+                <p>Tem certeza de que deseja remover esta estratégia?</p>
+                <button id="confirmYes">Sim</button>
+                <button id="confirmNo">Cancelar</button>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Inclui o JavaScript -->
+    <script src="/js/strategiePage.js"></script>
+
+</body>
+</html>
