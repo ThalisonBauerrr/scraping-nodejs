@@ -7,7 +7,7 @@
 
 /* Define o estilo da página com fundo branco e texto centralizado */
 body {
-    font-family: Arial, sans-serif;
+    font-family: "Sofia Pro ExtraLight";
     background-color: #0f1923;
     height: 100vh; /* A altura ocupa toda a tela */
     display: flex;
