@@ -1,0 +1,136 @@
+<h2>Adicionar Estratégia</h2>
+<form action="/strategies/save" method="POST" >
+    <!-- Contêiner para os botões -->
+    <!-- Campo para nome da estratégia -->
+    <div class="strategy-name-container">
+        <label for="strategyName">Nome da Estratégia:</label>
+        <input type="text" id="strategyName" name="strategyName" placeholder="Digite o nome da estratégia">
+    </div>
+
+    <div class="buttons-container">
+        <!-- Botões para adicionar cores alinhados à esquerda -->
+        <div class="color-buttons">
+            <button type="button" id="redButton" class="color-button redADD">VEMELHO</button>
+            <button type="button" id="blackButton" class="color-button blackADD">PRETO</button>
+            <button type="button" id="whiteButton" class="color-button whiteADD">BRANCO</button>
+        </div>
+
+        <!-- Botão Limpar alinhado à direita -->
+        <button type="button" id="clearSequenceBtn" class="clear-button">Limpar</button>
+    </div>
+
+    <!-- Exibição da sequência de cores (com as imagens) -->
+    <div class="sequence-display" id="sequenceDisplay">
+        <div id="sequenceImages" class="sequence-images">
+            <!-- Imagens da sequência serão adicionadas aqui -->
+        </div>
+    </div>
+
+    <h3>Apostar na cor: <span id="selectedColor"></span></h3>
+    <!-- Checkbox para escolher a cor -->
+    <div class="color-choice">
+        <label>
+            <input type="checkbox" name="color" value="red" id="redCheckbox">
+            <img src="img/red.png" alt="Red" width="40" height="40">
+        </label>
+
+        <label>
+            <input type="checkbox" name="color" value="black" id="blackCheckbox">
+            <img src="img/black.png" alt="Black" width="40" height="40">
+        </label>
+
+        <label>
+            <input type="checkbox" name="color" value="white" id="whiteCheckbox">
+            <img src="img/white.png" alt="White" width="40" height="40">
+        </label>
+    </div>
+
+    <!-- Campos de aposta -->
+    <div id="betFields">
+        <div class="bet-field">
+            <label for="betBlackRed">Valor aposta Preto/Vermelho:</label>
+            <input type="number" id="betBlackRed" name="betBlackRed" min="0" step="0.01">
+        </div>
+
+        <div class="bet-field" id="betWhiteField">
+            <label for="betWhite">Valor aposta Branco:</label>
+            <input type="number" id="betWhite" name="betWhite" min="0" step="0.01">
+        </div>
+
+        <div class="bet-field">
+            <label for="galeAmount">Quantidade de Gale:</label>
+            <select id="galeAmount" name="galeAmount">
+                <option value="0">0</option>
+                <option selected value="1">1</option>
+                <option value="2">2</option>
+                <option value="3">3</option>
+                <option value="4">4</option>
+            </select>
+        </div>
+    </div>
+
+    <div class="bet-field stop-container">
+        <div class="stop-input">
+            <label for="stopWin">Stop Win:</label>
+            <input type="number" id="stopWin" name="stopWin" min="0" step="1">
+        </div>
+        <div class="stop-input">
+            <label for="stopLoss">Stop Loss:</label>
+            <input type="number" id="stopLoss" name="stopLoss" min="-100" max="0" step="1">
+        </div>
+    </div>
+    <p style="font-family: 'Sofia Pro Light Italic'; font-size: 12px; text-align: center;">Lembre-se de calcular o stopLoss correto para não interromper o gale</p>
+    
+    <input type="hidden" name="sequence" value="">
+    <input type="hidden" name="userId" value="<%= userId %>">
+    
+    <!-- Botão para adicionar estratégia -->
+    <div class="add-strategy-container">
+        <button type="submit" id="addStrategyBtn" class="add-strategy-button">Adicionar Estratégia</button>
+    </div>
+</form>
+
+<script>
+    // Variável para armazenar a sequência de cores
+    const sequence = [];
+
+    // Adicionando cores à sequência quando clicados os botões
+    document.getElementById('redButton').addEventListener('click', function() {
+        sequence.push('red');
+        updateSequenceDisplay();
+    });
+
+    document.getElementById('blackButton').addEventListener('click', function() {
+        sequence.push('black');
+        updateSequenceDisplay();
+    });
+
+    document.getElementById('whiteButton').addEventListener('click', function() {
+        sequence.push('white');
+        updateSequenceDisplay();
+    });
+
+    // Função para atualizar a sequência visualmente
+    function updateSequenceDisplay() {
+        const sequenceDisplay = document.getElementById('sequenceImages');
+        sequenceDisplay.innerHTML = ''; // Limpa a sequência existente
+        sequence.forEach(color => {
+            const img = document.createElement('img');
+            img.src = `img/${color}.png`;
+            img.alt = color;
+            img.width = 40;
+            img.height = 40;
+            sequenceDisplay.appendChild(img);
+        });
+        document.getElementById('selectedColor').innerText = sequence[sequence.length - 1] || '';
+    }
+    document.querySelector('form').addEventListener('submit', (event) => {
+    const sequenceInput = document.querySelector('input[name="sequence"]');
+    sequenceInput.value = sequence.join(' -> ');  // Adiciona a sequência no campo oculto
+    });
+    // Limpar a sequência quando o botão Limpar for clicado
+    document.getElementById('clearSequenceBtn').addEventListener('click', function() {
+        sequence.length = 0;  // Limpa a sequência
+        updateSequenceDisplay();
+    });
+</script>

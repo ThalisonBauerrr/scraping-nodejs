@@ -1,0 +1,21 @@
+h3
+<h2>Vincular Conta Blaze</h2>
+
+<% if (user.conta_blaze) { %>
+    <p>📌 Sua conta Blaze está vinculada como: <strong><%= user.conta_blaze %></strong></p>
+    <p style="color: red;">❌ O cadastro é único e não pode ser alterado.</p>
+<% } else { %>
+    <form action="/set-blaze-account" method="POST">
+        <label for="emailBlaze">E-mail da Blaze:</label>
+        <input type="email" id="emailBlaze" name="emailBlaze" required>
+        <button type="submit">Vincular Conta</button>
+    </form>
+<% } %>
+
+<% if (typeof success !== 'undefined' && success) { %>
+    <p style="color: green;"><%= success %></p>
+<% } %>
+
+<% if (typeof error !== 'undefined' && error) { %>
+    <p style="color: red;"><%= error %></p>
+<% } %>

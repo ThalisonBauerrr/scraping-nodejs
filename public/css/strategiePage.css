@@ -1,0 +1,410 @@
+/* Estilo para o fundo da página */
+body.modal-open {
+    filter: blur(5px); /* Aplica o desfoque ao fundo */
+    transition: filter 0.3s ease-in-out; /* Suaviza a transição do desfoque */
+}
+
+/* Estilo para o Modal (Partial) */
+.modal {
+    display: none;  /* Modal começa invisível */
+    position: fixed;
+    z-index: 9999;  /* Garante que o modal fique sobre outros elementos */
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.4);  /* Fundo semi-transparente */
+    backdrop-filter: blur(5px); /* Efeito de desfoque no fundo */
+    justify-content: center;
+    align-items: center;
+}
+
+/* Conteúdo do Modal */
+.modal-content {
+    background-color: rgb(221, 220, 220);
+    padding: 20px;
+    margin-top: -50px;
+    border-radius: 8px;
+    width: 80%; /* Ajuste o tamanho conforme necessário */
+    max-width: 800px;
+    z-index: 10000; /* Garante que o conteúdo do modal fique sobre o fundo */
+    position: absolute; /* Garante que o conteúdo do modal não seja afetado pelo filtro */
+}
+
+/* Botão de fechar */
+.close-btn {
+    color: #aaa;
+    font-size: 28px;
+    font-weight: bold;
+    float: right;
+    cursor: pointer;
+}
+
+.close-btn:hover,
+.close-btn:focus {
+    color: black;
+    text-decoration: none;
+}
+
+/* Estilos para os botões e sequência */
+.sequence-display {
+    padding: 10px;
+    height: 100px;
+    background-color: #c2bfbf;
+    color: rgb(87, 86, 86);
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+#sequenceImages{
+    margin-top: 5px;
+}
+/* Botões de cores */
+.color-button {
+    padding: 10px;
+    margin: 5px;
+    border-width: 0px;
+    cursor: pointer;
+    border-radius: 5px;
+    font-size: 12px; /* Tamanho da fonte */
+    text-transform: uppercase;
+    transition: background-color 0.3s ease;
+}
+
+.redADD {
+    background-color: #c9212e;
+    color: white;
+}
+
+.blackADD {
+    background-color: #313131;
+    color: white;
+}
+
+.whiteADD {
+    background-color: white;
+    color: black;
+    border-width: 1px;
+}
+
+.color-button:hover {
+    opacity: 0.8;
+}
+
+/* Agrupar os botões de cores à esquerda */
+.buttons-container {
+    display: flex;
+    justify-content: space-between;
+    gap: 10px; /* Espaço entre os botões */
+    margin-bottom: 20px; /* Espaço abaixo dos botões */
+}
+
+/* Agrupar os botões de cores à esquerda */
+.color-buttons {
+    display: flex;
+    gap: 10px;
+}
+
+/* Botão Limpar alinhado à direita */
+#clearSequenceBtn {
+    background-color: #dc3545;
+    color: white;
+    padding: 10px;
+    border-radius: 5px;
+    border-width: 0px;
+    cursor: pointer;
+    font-size: 12px;
+    text-transform: uppercase;
+}
+
+#clearSequenceBtn:hover {
+    opacity: 0.8;
+}
+
+/* Exibição da sequência de cores (com as imagens) */
+.sequence-images {
+    display: flex;
+    gap: 10px; /* Espaço entre as imagens */
+}
+
+.sequence-images img {
+    width: 50px;
+    height: 50px; /* Tamanho das imagens */
+}
+
+/* Estilos para a div de confirmação quando o limite de cores for atingido */
+.confirmation-modal {
+    display: none;  /* Modal começa invisível */
+    position: fixed;
+    z-index: 9999;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.6);  /* Fundo escurecido */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/* Conteúdo da confirmação */
+.confirmation-content {
+    background-color: white;
+    padding: 20px;
+    border-radius: 8px;
+    width: 80%;
+    max-width: 400px;
+    text-align: center;
+}
+
+/* Botões de confirmação - OK, Sim, Não */
+button#okayBtn {
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+}
+
+button#okayBtn:hover {
+    opacity: 0.8;
+}
+
+/* Estilos para os botões de confirmação "Sim" e "Não" */
+button#confirmYes,#confirmYes1,
+button#confirmNo,button#confirmNo1 {
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+    margin: 10px;
+}
+
+button#confirmYes,#confirmYes1 {
+    background-color: #28a745;
+    color: white;
+    border: none;
+}
+
+button#confirmNo,#confirmNo1 {
+    background-color: #dc3545;
+    color: white;
+    border: none;
+}
+
+button#confirmYes:hover,#confirmYes1:hover, 
+button#confirmNo:hover, button#confirmNo1:hover {
+    opacity: 0.8;
+}
+
+/* Botão Limpar com estilo */
+#clearSequenceBtn {
+    background-color: #dc3545;
+    color: white;
+    padding: 10px;
+    border-radius: 5px;
+    border-width: 0px;
+    cursor: pointer;
+    font-size: 12px;
+    text-transform: uppercase;
+}
+
+#clearSequenceBtn:hover {
+    opacity: 0.8;
+}
+
+/* Estilo geral para os botões de checkbox e imagens */
+.color-choice label {
+    display: inline-block;
+    margin: 10px;
+    text-align: center;
+}
+
+.color-choice input[type="checkbox"] {
+    display: none; /* Esconde o checkbox */
+}
+
+.color-choice img {
+    transition: transform 0.3s ease; /* Efeito de transição ao passar o mouse */
+    cursor: pointer;
+}
+
+/* Efeito de hover para aumentar a imagem */
+.color-choice input[type="checkbox"]:checked + img {
+    transform: scale(1.3);  /* Aumenta a imagem quando o checkbox está selecionado */
+}
+
+/* Estilo do elemento que exibe a cor escolhida */
+#selectedColorDisplay {
+    margin-top: 20px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+/* Estilo para o texto e a imagem da cor selecionada */
+#selectedColorImage {
+    width: 50px;
+    height: 50px;
+}
+#selectedColor{
+    font-family: 'Sofia Pro SemiBold'
+}
+
+/* Estilo para os campos de aposta */
+.bet-field {
+    margin-bottom: 15px;
+}
+
+.bet-field label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: bold;
+}
+
+.bet-field input,
+.bet-field select {
+    width: 100%;
+    padding: 8px;
+    box-sizing: border-box;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+/* Esconde o campo de aposta no Branco inicialmente */
+#betWhiteField {
+    display: none;
+}
+
+/* Estilo para o contêiner dos inputs Stop Loss e Stop Win */
+.stop-container {
+    display: flex; /* Ativa o layout flexível */
+    gap: 10px; /* Espaçamento entre os inputs */
+}
+
+/* Estilo para cada input (Stop Loss e Stop Win) */
+.stop-input {
+    flex: 1; /* Faz com que os inputs ocupem o mesmo espaço */
+}
+
+.stop-input label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: bold;
+}
+
+.stop-input input {
+    width: 100%;
+    padding: 8px;
+    box-sizing: border-box;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+/* Estilo para o input Stop Loss */
+#stopLoss {
+    border: 1px solid red; /* Borda preta de 1px */
+}
+
+/* Estilo para o input Stop Win */
+#stopWin {
+    border: 1px solid green; /* Borda verde de 1px */
+}
+/* Estilo para o contêiner do botão */
+.add-strategy-container {
+    text-align: center;
+    margin-top: 20px;
+}
+
+/* Estilo para o botão "Adicionar Estratégia" */
+.add-strategy-button {
+    background-color: #4CAF50; /* Verde */
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: background-color 0.3s ease;
+}
+
+.add-strategy-button:hover {
+    background-color: #45a049; /* Verde mais escuro ao passar o mouse */
+}
+.strategy-name-container {
+    margin-bottom: 15px;
+}
+.strategy-name-container label {
+    display: block;
+    font-weight: bold;
+    margin-bottom: 5px;
+}
+.strategy-name-container input {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
+
+.menu-container {
+    position: relative; /* Define o contêiner como referência */
+    display: inline-block; /* Evita ocupar toda a largura */
+}
+
+.menu {
+    position: absolute;
+    top: 100%; /* Faz o menu aparecer logo abaixo do botão */
+    left: 0; /* Alinha o menu à esquerda do botão */
+    background-color: #fff;
+    border: 1px solid #444;
+    border-radius: 5px;
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+    display: none; /* Esconde o menu inicialmente */
+    width: 220px;
+    z-index: 1000;
+    overflow: hidden; /* Evita bordas estranhas ao aplicar hover */
+    margin-top: 10px;
+}
+
+.menu a {
+    display: flex;
+    align-items: center;
+    text-decoration: none;
+    color: #333;
+    font-size: 13px;
+    padding: 10px;
+    flex-grow: 1; /* Garante que o link ocupe o espaço necessário */
+}
+
+.menu a:last-child {
+    border-bottom: none;
+}
+
+.menu a:hover {
+    background-color: #f5f5f5;
+    color: #e1003c; /* Vermelho */
+    font-weight: bold;
+}
+
+.menu a span {
+    margin-left: 10px;
+}
+
+.menu .sign-out {
+    color: #ff4d4d;
+}
+
+.icons {
+    display: flex;
+    align-items: center;
+    margin: 0 32px;
+}
+
+.disabled {
+    background-color: gray !important;
+    cursor: not-allowed !important;
+    opacity: 0.6;
+}
+
+

@@ -1,0 +1,39 @@
+
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>LethalCode</title>
+    <link rel="stylesheet" href="/css/dashboard.css">
+    <link rel="stylesheet" href="/css/botoes.css">
+    <link rel="stylesheet" href="/css/startPage.css">
+    <link rel="stylesheet" href="/font/font.css">
+     <!-- Caminho para o seu arquivo de estilo -->
+</head>
+
+<body>
+    
+     <!-- aqui enseri header -->
+     <%- include('partials/header') %>
+     <div class="principal">
+        
+        <div id="leftbar"></div>
+        <div id="page-container">
+            <form id="authForm">
+                <input type="email" id="email" name="email" value="<%= user?.conta_blaze || '' %>" readonly required>
+                <input type="password" id="password" name="password" required>
+            </form>
+            <div style="margin-top: 10px;">
+            <button class="runButton" type="button" id="runButton">Run</button>
+            <button class="stopButton" type="button" id="stopButton">Stop</button>
+            </div>
+            <p id="isRun"></p>
+            <div style="color: green;" id="result"></div>
+            <h3>Últimos Logs:</h3>
+            <div id="isLogs" style="overflow-y: auto; padding: 10px; font-size: 14px;"></div>
+        </div>
+    </div>
+ <!-- Incluindo o JavaScript -->
+ <script src="/js/startPage.js"></script> <!-- Script global -->
+</body>
+</html>

@@ -1,0 +1,61 @@
+/* Estilo para o corpo da página */
+body {
+    background-color: #0f1923; /* Cor de fundo */
+    margin: 0;
+    font-family: 'Sofia Pro Light', sans-serif;
+}
+h1 {
+    color: #333;
+}
+/* Estilo para o contêiner de login */
+.login-container {
+    display: flex;
+    justify-content: center; /* Centraliza horizontalmente */
+    align-items: center; /* Centraliza verticalmente */
+    min-height: 100vh; /* Garante que ocupe a altura da tela */
+}
+
+form {
+    background-color: white;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    max-width: 400px; /* Limita a largura do formulário */
+}
+
+input[type="email"],
+input[type="password"],
+input[type="checkbox"] {
+    width: 100%;
+    padding: 10px;
+    margin: 10px 0;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-sizing: border-box;
+}
+
+button {
+    width: 100%;
+    padding: 10px;
+    background-color: #4CAF50;
+    color: white;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+button:hover {
+    background-color: #45a049;
+}
+
+a {
+    display: block;
+    text-align: center;
+    margin-top: 10px;
+    color: #5f6368;
+    text-decoration: none;
+}
+
+a:hover {
+    text-decoration: underline;
+}
