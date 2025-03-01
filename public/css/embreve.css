@@ -1,0 +1,31 @@
+/* Reseta a margem e o padding para evitar qualquer problema de layout */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+/* Define o estilo da página com fundo branco e texto centralizado */
+body {
+    font-family: Arial, sans-serif;
+    background-color: white;
+    height: 100vh; /* A altura ocupa toda a tela */
+    display: flex;
+    flex-direction: column;
+    justify-content: center; /* Centraliza verticalmente */
+    align-items: center; /* Centraliza horizontalmente */
+    text-align: center;
+}
+
+/* Estilo do título "EM BREVE" */
+h1 {
+    font-size: 3rem;
+    color: #333;
+    margin-bottom: 20px;
+}
+
+/* Estilo para o logo */
+.logo {
+    max-width: 200px; /* Tamanho máximo do logo */
+    max-height: 200px;
+}

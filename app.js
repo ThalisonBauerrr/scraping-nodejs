@@ -1,15 +1,30 @@
 // Importa o Express
 const express = require('express');
+const path = require('path');
 
-// Cria uma instância do aplicativo Express
+// Cria a instância do aplicativo Express
 const app = express();
 
 // Define a porta em que o servidor vai rodar
 const port = 3000;
 
-// Define a rota para a raiz e responde com "Hello, World!"
+// Configuração do EJS como motor de template
+app.set('view engine', 'ejs');
+
+// Define o diretório onde os arquivos EJS estão localizados
+app.set('views', path.join(__dirname, 'views'));
+
+// Serve os arquivos estáticos (CSS, JS, Imagens) da pasta 'public'
+app.use(express.static(path.join(__dirname, 'public')));
+
+// Rota para a página principal (index.ejs)
 app.get('/', (req, res) => {
-  res.send('Hello, World!');
+  res.render('index');  // Renderiza o arquivo index.ejs da pasta views
+});
+
+// Rota para a página "EM BREVE"
+app.get('/embreve', (req, res) => {
+  res.render('embreve');  // Renderiza o arquivo embreve.ejs (você pode criar esse arquivo)
 });
 
 // Inicia o servidor e escuta na porta especificada
