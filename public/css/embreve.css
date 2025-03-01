@@ -8,7 +8,7 @@
 /* Define o estilo da página com fundo branco e texto centralizado */
 body {
     font-family: Arial, sans-serif;
-    background-color: white;
+    background-color: rgba(12,21,29,.78);
     height: 100vh; /* A altura ocupa toda a tela */
     display: flex;
     flex-direction: column;
