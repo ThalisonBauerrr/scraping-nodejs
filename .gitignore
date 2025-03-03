@@ -1,2 +1,5 @@
-config/
+# Ignorar a pasta node_modules
 node_modules/
+
+# Ignorar a pasta config
+config/

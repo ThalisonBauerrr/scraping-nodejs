@@ -309,17 +309,17 @@ module.exports = {
                 return;  // Ignora o usuário
             }
     
-            // Se o stop_loss estiver definido, calcula como "balance - (balance * stop_loss / 100)"
+            // Cálculo de stop_loss: percentual do balance
             let calculatedStopLoss;
             if (stop_loss !== undefined && stop_loss !== null) {
                 // O stop_loss é calculado como um percentual do saldo
-                calculatedStopLoss = balance - (balance * (stop_loss / 100));
+                calculatedStopLoss = balance - (balance * (stop_loss / 100)); // Stop loss é balance - (percentual de stop_loss)
             } else {
                 // Se o stop_loss não estiver definido, define 10% do saldo
                 calculatedStopLoss = balance * 0.10;  // 10% do saldo
             }
     
-            // Calcula o stop_win baseado no valor de meta_diaria e balance
+            // Cálculo de stop_win: percentual do balance
             let stopWin = balance + (balance * (meta_diaria / 100)); // Meta diária é a porcentagem para o stop_win
     
             // Certificar-se de que stopWin é um número
@@ -381,7 +381,6 @@ module.exports = {
             throw new Error("Erro ao atualizar a meta diária.");
         }
     },
-    
     
     updateUserBalance : async (userId,balance) => {
         try {
