@@ -3,7 +3,7 @@ require('dotenv').config(); // Carrega variáveis de ambiente do arquivo .env
 
 // Configuração do pool de conexões
 const pool = mysql.createPool({
-    host: process.env.DB_HOST || '147.93.10.180', // Endereço do banco de dados
+    host: process.env.DB_HOST || '127.0.0.1', // Endereço do banco de dados
     user: process.env.DB_USER || 'lethalcode',      // Usuário do banco
     password: process.env.DB_PASSWORD || 'p5pexvm', // Senha do banco
     database: process.env.DB_NAME || 'lethalcode',  // Nome do banco de dados
