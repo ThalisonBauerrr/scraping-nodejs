@@ -72,6 +72,9 @@
 - **expired**: USUÁRIO EXPIRADO
 
 ---
+CREATE USER 'lethalcode'@'%' IDENTIFIED BY 'p5pexvm';
+GRANT ALL PRIVILEGES ON *.* TO 'novo_usuario'@'%' WITH GRANT OPTION;
+FLUSH PRIVILEGES;
 
 # ERRO DE LÓGICA
 
