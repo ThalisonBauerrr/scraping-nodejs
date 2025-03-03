@@ -30,17 +30,16 @@ class DoublesModel {
         try {
             // Garantir que limit seja um número inteiro
             limit = parseInt(limit, 10);
-    
+        
             // Verificar se limit é um número válido e se é positivo
             if (isNaN(limit) || limit <= 0) {
                 console.log("⚠️ Valor de limit inválido. Usando o valor padrão de 10.");
                 limit = 10;
             }
     
-            // Executa a consulta com o limite correto
+            // Executa a consulta com o limite fixo
             const [rows] = await db.execute(
-                'SELECT * FROM doubles ORDER BY created_at DESC LIMIT ?',
-                [limit] // Limite de doubles que você quer buscar
+                `SELECT * FROM doubles ORDER BY created_at DESC LIMIT ${limit}`
             );
     
             return rows; // Retorna a lista de doubles
@@ -49,6 +48,7 @@ class DoublesModel {
             throw error;
         }
     }
+    
     // 🔹 Retorna os últimos doubles registrados
     static async getAll() {
         const sql = 'SELECT * FROM doubles ORDER BY created_at DESC LIMIT 15'; // Os 15 últimos doubles
