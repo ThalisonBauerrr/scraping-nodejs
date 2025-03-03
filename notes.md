@@ -56,7 +56,7 @@
 - Email: ThalisonP5pe@123
 - Senha: GpTLCQT2qLopVP&6g8@p
 - Admin: admin@sparkblaze.com.br
-
+-/usr/local/lsws/Example/html/node
 
 ### STATUS DA ROLETA
 

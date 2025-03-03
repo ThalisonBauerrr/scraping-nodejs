@@ -331,8 +331,8 @@ module.exports = {
                 return;
             }
     
-            // Arredondar o valor de stopWin para 3 casas decimais
-            stopWin = stopWin.toFixed(3); // Aqui, agora temos certeza de que stopWin é um número
+            // Arredondar o valor de stopWin para 3 casas decimais e garantir que seja número
+            stopWin = parseFloat(stopWin.toFixed(3)); // Agora é um número, não uma string
     
             // Obtém a data de hoje no formato 'YYYY-MM-DD'
             const today = new Date().toISOString().split('T')[0];
@@ -381,6 +381,7 @@ module.exports = {
             throw new Error("Erro ao atualizar a meta diária.");
         }
     },
+    
     
     updateUserBalance : async (userId,balance) => {
         try {
