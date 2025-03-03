@@ -320,7 +320,16 @@ module.exports = {
             }
     
             // Calcula o stop_win baseado no valor de meta_diaria e balance
-            const stopWin = balance + (balance * (meta_diaria / 100)); // Meta diária é a porcentagem para o stop_win
+            let stopWin = balance + (balance * (meta_diaria / 100)); // Meta diária é a porcentagem para o stop_win
+    
+            // Arredondar o valor de stopWin para 3 casas decimais
+            stopWin = parseFloat(stopWin.toFixed(3));
+    
+            // Verifica se o valor de stopWin é válido
+            if (isNaN(stopWin)) {
+                console.log(` ⚠️ Valor inválido de stopWin para o usuário ${userId}, pulando...`);
+                return;
+            }
     
             // Obtém a data de hoje no formato 'YYYY-MM-DD'
             const today = new Date().toISOString().split('T')[0];
@@ -354,7 +363,7 @@ module.exports = {
                     VALUES (?, ?, ?, ?, ?, NOW(), NOW())`,
                     [userId, meta_diaria, calculatedStopLoss, stopWin, balance]
                 );
-
+    
                 // Atualizar o status do usuário na tabela 'users' de 'stopped' para 'active'
                 await db.execute(
                     `UPDATE users
@@ -362,7 +371,7 @@ module.exports = {
                     WHERE id = ? AND user_status = 'stopped'`,
                     [userId]
                 );
-
+    
                 console.log(`🎯 Meta diária inserida para o usuário ${userId} e status alterado para 'active'`);
             }
         } catch (error) {
@@ -370,6 +379,7 @@ module.exports = {
             throw new Error("Erro ao atualizar a meta diária.");
         }
     },
+    
     updateUserBalance : async (userId,balance) => {
         try {
 
