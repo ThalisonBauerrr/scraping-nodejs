@@ -22,9 +22,10 @@ if (!homeController || !authController || !blazeAuthController || !strategyContr
 //   res.render('dashboard'); 
 //});
 router.get('/', (req, res) => {
-    res.sendFile(path.join(__dirname, 'index.html'));
-  });
-  
+    // Serve o index.html que está na raiz do projeto
+    res.sendFile(path.join(__dirname, '..', 'index.html'));  // Ajuste o caminho para a raiz
+});
+
 router.get('/login', authController.loginPage);
 router.post('/login', authController.login);
 
