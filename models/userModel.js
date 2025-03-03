@@ -322,14 +322,17 @@ module.exports = {
             // Calcula o stop_win baseado no valor de meta_diaria e balance
             let stopWin = balance + (balance * (meta_diaria / 100)); // Meta diária é a porcentagem para o stop_win
     
-            // Arredondar o valor de stopWin para 3 casas decimais
-            stopWin = parseFloat(stopWin.toFixed(3));
+            // Certificar-se de que stopWin é um número
+            stopWin = parseFloat(stopWin);
     
-            // Verifica se o valor de stopWin é válido
+            // Verificar se stopWin é um número válido antes de arredondar
             if (isNaN(stopWin)) {
                 console.log(` ⚠️ Valor inválido de stopWin para o usuário ${userId}, pulando...`);
                 return;
             }
+    
+            // Arredondar o valor de stopWin para 3 casas decimais
+            stopWin = stopWin.toFixed(3); // Aqui, agora temos certeza de que stopWin é um número
     
             // Obtém a data de hoje no formato 'YYYY-MM-DD'
             const today = new Date().toISOString().split('T')[0];
@@ -344,7 +347,6 @@ module.exports = {
     
                 // Se a data de criação for hoje, não pode atualizar
                 if (createdDate === today) {
-                    //console.log(`⚠️  A meta diária já foi configurada hoje para o usuário ${userId}. Não será possível alterar.`);
                     return;  // Impede a atualização
                 }
     
