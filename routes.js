@@ -18,9 +18,13 @@ if (!homeController || !authController || !blazeAuthController || !strategyContr
 }
 
 // 🔹 Rotas da Página Web
+//router.get('/', (req, res) => {
+//   res.render('dashboard'); 
+//});
 router.get('/', (req, res) => {
-    res.render('dashboard'); 
-});
+    res.sendFile(path.join(__dirname, 'index.html'));
+  });
+  
 router.get('/login', authController.loginPage);
 router.post('/login', authController.login);
 
