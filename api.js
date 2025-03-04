@@ -95,7 +95,7 @@ class BlazeAuth {
                     console.warn(`⚠ Tentativa ${attempt} falhou com status ${response.status}.`);
                 }
             } catch (error) {
-                console.error(`❌ Erro na tentativa ${attempt}:`, error.response ? error.response.data : error.message);
+                //console.error(`❌ Erro na tentativa ${attempt}:`, error.response ? error.response.data : error.message);
     
                 // Se o erro for 502 (Bad Gateway), tente novamente com intervalo maior
                 if (error.response && error.response.status === 502) {
@@ -103,7 +103,7 @@ class BlazeAuth {
                 }
     
                 if (attempt < retries) {
-                    console.log(`🔄 Tentando novamente em 10 segundos...`);
+                    //console.log(`🔄 Tentando novamente em 10 segundos...`);
                     await new Promise(resolve => setTimeout(resolve, 10000)); // Aumentei o intervalo para 10 segundos
                 } else {
                     throw new Error("❌ Falha ao obter últimos doubles após várias tentativas.");
@@ -142,11 +142,11 @@ class BlazeAuth {
             // Verifica o status da resposta
             if (response.status === 200) {
                 const statusDouble = response.data.status;
-                console.log(`✅ Status da requisição: ${statusDouble}`);
+                //console.log(`✅ Status da requisição: ${statusDouble}`);
                 return statusDouble; // Retorna o status do double (ex: "waiting", "started")
             } else {
                 // Trata outros códigos de status HTTP
-                console.error(`❌ Erro ao pegar status. Status: ${response.status}`);
+                //console.error(`❌ Erro ao pegar status. Status: ${response.status}`);
                 throw new Error(`Erro ao pegar status. Código: ${response.status}`);
             }
     

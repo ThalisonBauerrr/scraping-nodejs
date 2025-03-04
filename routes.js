@@ -228,39 +228,7 @@ router.get("/check-running-status", async (req, res) => {
         return res.status(500).json({ success: false, message: "Erro ao buscar status." });
     }
 });
-router.get("/blaze-content", async (req, res) => {
-    try {
-        const url = "https://blaze.bet.br/pt/games/double";
-        const response = await axios.get(url, { headers: { "User-Agent": "Mozilla/5.0" } });
 
-        let modifiedHtml = response.data;
-
-        // 🔹 Injeta um script que fecha o popup automaticamente
-        modifiedHtml = modifiedHtml.replace(
-            "</body>",
-            `
-            <script>
-                document.addEventListener("DOMContentLoaded", function() {
-                    setTimeout(() => {
-                        let popupButton = document.querySelector("#policy-regulation-popup div div:nth-child(2) div button");
-                        if (popupButton) {
-                            console.log("✅ Fechando popup...");
-                            popupButton.click();
-                        } else {
-                            console.log("❌ Botão de fechar popup não encontrado.");
-                        }
-                    }, 3000); // Aguarda 3 segundos antes de tentar clicar
-                });
-            </script>
-            </body>`
-        );
-
-        res.send(modifiedHtml);
-    } catch (error) {
-        console.error("❌ Erro ao buscar conteúdo da Blaze:", error.message);
-        res.status(500).send("Erro ao obter conteúdo.");
-    }
-});
 // Rota para atualizar a meta diária de um usuário específico
 router.post('/update-meta/:userId', authController.requireAuth, async (req, res) => {
     const userId = req.params.userId; // Pega o userId da URL
