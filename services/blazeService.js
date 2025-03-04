@@ -107,7 +107,7 @@ class BlazeService {
     
                     // Formata a data e hora para um formato mais legível
                     const formattedDate = new Date(currentDouble.created_at).toLocaleString();
-                    console.log(`\n🎰 Double ID: ${currentDouble.id} | Cor: ${colorEmoji[currentDouble.color]} | Roll: ${currentDouble.roll} | Hora: ${formattedDate}`);
+                    console.log(`🎰 Double ID: ${currentDouble.id} | Cor: ${colorEmoji[currentDouble.color]} | Roll: ${currentDouble.roll} | Hora: ${formattedDate}`);
     
                         // Atualiza as estatísticas conforme a cor sorteada
                         if (currentDouble.color === 0) { // Branco
@@ -248,7 +248,7 @@ class BlazeService {
                     continue;
                 }
     
-                console.log(`✅ Verificando estratégias para o usuário: ${user.email}`);
+                console.log(`✅ Verificando estratégias para o usuário: ${user.email} \n`);
                 
                 // Itera sobre cada estratégia ativa do usuário
                 for (const activeStrategy of activeStrategies) {
