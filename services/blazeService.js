@@ -68,7 +68,7 @@ class BlazeService {
            // console.log(`✅ Status Atual da Blaze: ${status || "Erro ao obter status"}`);
 
             // Se o status for "waiting", retorna true
-            if (status === "waiting") {
+            if (status === "complete") {
                 //console.log("🔄 Status é 'waiting'. Iniciando verificação dos doubles...");
                 return true;
             }

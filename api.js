@@ -80,7 +80,7 @@ class BlazeAuth {
         }
     }
     // 🔹 Método para obter os últimos doubles com retry automático
-    async getLastDoubles(retries = 3) {
+    async getLastDoubles(retries = 10) {
         this._ensureAuthenticated();
     
         for (let attempt = 1; attempt <= retries; attempt++) {
@@ -104,7 +104,7 @@ class BlazeAuth {
     
                 if (attempt < retries) {
                     //console.log(`🔄 Tentando novamente em 10 segundos...`);
-                    await new Promise(resolve => setTimeout(resolve, 10000)); // Aumentei o intervalo para 10 segundos
+                    await new Promise(resolve => setTimeout(resolve, 1500)); // Aumentei o intervalo para 10 segundos
                 } else {
                     throw new Error("❌ Falha ao obter últimos doubles após várias tentativas.");
                 }
