@@ -322,6 +322,9 @@ module.exports = {
             // Cálculo de stop_win: percentual do balance
             let lucro = balance * (meta_diaria / 100)
             let stopWin = parseFloat(balance) + parseFloat(lucro)  
+
+            // Arredondar o valor de stopWin para 3 casas decimais e garantir que seja número
+            stopWin = parseFloat(stopWin.toFixed(3)); // Agora é um número, não uma string
             
             // Verificar se stopWin é um número válido antes de arredondar
             if (isNaN(stopWin)) {
@@ -329,8 +332,7 @@ module.exports = {
                 return;
             }
     
-            // Arredondar o valor de stopWin para 3 casas decimais e garantir que seja número
-            stopWin = parseFloat(stopWin.toFixed(3)); // Agora é um número, não uma string
+
     
             // Obtém a data de hoje no formato 'YYYY-MM-DD'
             const today = new Date().toISOString().split('T')[0];
