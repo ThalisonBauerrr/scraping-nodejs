@@ -72,7 +72,7 @@ function startServer() {
     setupRoutes(app);
 
     // 🔹 Inicia o servidor
-    app.listen(port, '127.0.0.1', async () => {
+    app.listen(port, async () => {
         console.log(`🚀 Servidor rodando em http://localhost:${port}`);
     
 
