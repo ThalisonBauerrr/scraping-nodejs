@@ -21,10 +21,11 @@ if (!homeController || !authController || !blazeAuthController || !strategyContr
 // 🔹 Rotas da Página Web
 //router.get('/', (req, res) => {
 //   res.render('dashboard'); 
-//});
+//});+
+
 router.get('/', (req, res) => {
     // Serve o index.html que está na raiz do projeto
-    res.sendFile(path.join(__dirname, '..', 'index.html'));  // Ajuste o caminho para a raiz
+    res.sendFile(path.join(__dirname, 'index.html'));  // O caminho agora é direto
 });
 
 router.get('/login', authController.loginPage);
