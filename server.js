@@ -14,7 +14,7 @@ const cron = require('node-cron'); // Importa o node-cron
 
 const routes = require('./routes'); // Importando as rotas organizadas
 const app = express();
-const port = process.env.PORT || 3000;
+const port = 80;
 const sessionStore = new MySQLStore({}, db);
 
 // 🔹 Função para atualizar o status dos usuários
