@@ -248,7 +248,7 @@ class BlazeService {
                     continue;
                 }
     
-                console.log(`✅ Verificando estratégias para o usuário: ${user.email} \n`);
+                console.log(`\n ✅ Verificando estratégias para o usuário: ${user.email}`);
                 
                 // Itera sobre cada estratégia ativa do usuário
                 for (const activeStrategy of activeStrategies) {
