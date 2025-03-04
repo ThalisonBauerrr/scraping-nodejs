@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const cheerio = require("cheerio");
 const axios = require("axios");
+const path = require('path');
 // 🔹 Importando corretamente os controllers
 const homeController = require("./controllers/homeController");
 const authController = require("./controllers/authController");
