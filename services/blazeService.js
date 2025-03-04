@@ -470,7 +470,7 @@ class BlazeService {
             let adjustedBetAmount;
             if (user.recuperation === 1 && user.lossAccumulator > 0 && modo === 0) {
                 // Quando recuperation é 1 e lossAccumulator é maior que 0, ajustamos com lossAccumulator
-                adjustedBetAmount = await this.calcularApostaMartingale(user.lossAccumulator, gale+1, modo);
+                adjustedBetAmount = await this.calcularApostaMartingale(user.lossAccumulator, gale, modo);
                 adjustedBetAmount = parseFloat(adjustedBetAmount).toFixed(3); // Garantir que seja um número
             } else {
                 // Caso contrário, usamos o betAmount padrão
