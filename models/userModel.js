@@ -322,16 +322,12 @@ module.exports = {
             // Cálculo de stop_win: percentual do balance
             let lucro = balance * (meta_diaria / 100)
             let stopWin = balance + lucro  
-            console.log(lucro)
-            // Certificar-se de que stopWin é um número
-            stopWin = parseFloat(stopWin);
     
             // Verificar se stopWin é um número válido antes de arredondar
             if (isNaN(stopWin)) {
                 console.log(` ⚠️ Valor inválido de stopWin para o usuário ${userId}, pulando...`);
                 return;
             }
-    
             // Arredondar o valor de stopWin para 3 casas decimais e garantir que seja número
             stopWin = parseFloat(stopWin.toFixed(3)); // Agora é um número, não uma string
     
