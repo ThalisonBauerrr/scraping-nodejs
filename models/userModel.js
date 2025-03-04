@@ -321,7 +321,7 @@ module.exports = {
     
             // Cálculo de stop_win: percentual do balance
             let lucro = balance * (meta_diaria / 100)
-            let stopWin = balance + lucro  
+            let stopWin = parseFloat(balance) + parseFloat(lucro)   
             // Certificar-se de que stopWin é um número
             console.log(stopWin)
             stopWin = parseFloat(stopWin);
