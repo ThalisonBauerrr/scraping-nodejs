@@ -72,8 +72,9 @@ function startServer() {
     setupRoutes(app);
 
     // 🔹 Inicia o servidor
-    app.listen(port, async () => {
-        console.log("🚀 Servidor rodando em http://localhost:3000");
+    app.listen(port, '0.0.0.0', async () => {
+        console.log(`🚀 Servidor rodando em http://localhost:${port}`);
+    
 
         await Strategy.updateBettingStatusSEMWHERE('inactive');
         // Chama o método para garantir que o processo de verificação dos doubles inicie
