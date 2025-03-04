@@ -14,7 +14,7 @@ const cron = require('node-cron'); // Importa o node-cron
 
 const routes = require('./routes'); // Importando as rotas organizadas
 const app = express();
-const port = 80;
+const port = process.env.PORT || 3000;
 const sessionStore = new MySQLStore({}, db);
 
 // 🔹 Função para atualizar o status dos usuários
@@ -72,7 +72,7 @@ function startServer() {
     setupRoutes(app);
 
     // 🔹 Inicia o servidor
-    app.listen(port, '0.0.0.0', async () => {
+    app.listen(port, '127.0.0.1', async () => {
         console.log(`🚀 Servidor rodando em http://localhost:${port}`);
     
 
