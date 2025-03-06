@@ -1,36 +1,55 @@
+require('dotenv').config({ path: './config/.env' }); // Carregar variáveis de ambiente
 const express = require('express');
+const session = require('express-session');
 const path = require('path');
-const mysql = require('mysql2'); // Importando mysql2
-
+const bodyParser = require('body-parser');
+const cookieParser = require('cookie-parser');
+const cors = require('cors');
+const MySQLStore = require('express-mysql-session')(session);
+const db = require('./config/db'); // Conexão com MySQL
+const routes = require('./routes'); // Importando as rotas organizadas
 const app = express();
-const port = process.env.PORT || 3000;
+const sessionStore = new MySQLStore({}, db);
 
-// Configuração do banco de dados
-const db = mysql.createConnection({
-  host: '127.0.0.1', // Substitua com o endereço do servidor de banco de dados
-  user: 'lethalcode', // Substitua com seu nome de usuário do MySQL
-  password: 'p5pexvm', // Substitua com sua senha do MySQL
-  database: 'lethalcode' // Substitua com o nome do seu banco de dados
-});
+// 🔹 Configurar Middleware
+function setupMiddleware(app) {
+    app.set('view engine', 'ejs');
 
-// Conectar ao banco de dados
-db.connect((err) => {
-  if (err) {
-    console.error('Erro ao conectar ao banco de dados: ', err.stack);
-    return;
-  }
-  console.log('Conectado ao banco de dados com id ' + db.threadId);
-});
+    app.use(session({
+        secret: process.env.SESSION_SECRET || 'segredo_super_secreto',
+        resave: false,
+        saveUninitialized: false, // 🔹 Impede salvar sessões vazias
+        store: sessionStore, // 🔹 Certifique-se de que está apontando para o MySQL
+        cookie: {
+            maxAge: 3 * 24 * 60 * 60 * 1000, // 3 dias de duração
+            httpOnly: true,
+            secure: false // Se estiver rodando localmente, deixe `false`
+        }
+    }));
 
-// Serve arquivos estáticos como CSS, JS, Imagens da pasta 'public'
-app.use(express.static(path.join(__dirname, 'public')));
+    app.use((req, res, next) => {
+        res.locals.user = req.session.user || null; // 🔹 Define `user` globalmente
+        next();
+    });
+    app.use(express.static(path.join(__dirname, 'public')));
+    app.use('/img', express.static(path.join(__dirname, 'img'))); // Serve a pasta img como estática
 
-// Rota para servir o arquivo 'index.html'
-app.get('/', (req, res) => {
-  res.sendFile(path.join(__dirname, 'index.html'));
-});
+    app.use(bodyParser.urlencoded({ extended: true }));
+    app.use(bodyParser.json());
+    app.use(express.json());
+    app.use(cookieParser());
+    app.use(cors());
+}
 
-// Iniciar o servidor
-app.listen(port, () => {
-  console.log(`Servidor rodando em http://localhost:${port}`);
-});
+// 🔹 Configuração das rotas
+function setupRoutes(app) {
+    app.use('/', routes); // Usa o arquivo central de rotas
+}
+
+// 🔹 Inicialização do servidor
+function startServer() {
+    setupMiddleware(app);
+    setupRoutes(app);
+}
+
+startServer();

@@ -20,21 +20,21 @@ class DoublesModel {
         }
     }
     // 🔹 Busca os doubles pelo ID
-    static async findByDoubleId(doubleId) {
-        const sql = 'SELECT * FROM doubles ORDER BY id DESC LIMIT 1'; // Pegando o último registro com base no ID
+    static async findByDoubleId() {
+        const sql = 'SELECT double_id FROM doubles ORDER BY id DESC LIMIT 1'; // Pegando o último ID
         
         try {
             const [rows] = await db.execute(sql);
             
-            // Verifica se o último registro tem o double_id igual ao passado
-            if (rows.length > 0 && rows[0].double_id === doubleId) {
-                return rows[0]; // Retorna o registro se os double_ids coincidirem
+            // Verifica se algum registro foi encontrado
+            if (rows.length > 0) {
+                return rows[0].double_id; // Retorna o último id encontrado
             }
             
-            // Se não encontrar o registro ou o double_id não coincidir, retorna null
+            // Se não encontrar nenhum registro, retorna null
             return null;
         } catch (error) {
-            console.error("❌ Erro ao buscar double por ID:", error);
+            console.error("❌ Erro ao buscar o último ID:", error);
             throw error;
         }
     }

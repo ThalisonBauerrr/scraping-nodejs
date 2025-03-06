@@ -97,26 +97,13 @@ class BlazeService {
     async getDoubles() {
         try {
             const doubles = await this.blazeAuth.getLastDoubles(); // Chama a função que já existe para pegar os doubles
-            if (!doubles || doubles.length === 0) {
-                console.log("❌ Nenhum double encontrado.");
-                return null;  // Retorna null se não houver doubles
-            }
-    
-            const currentDouble = doubles[0];  // Pegando o último double (o primeiro da lista)
-            console.log(currentDouble.id+"   -   "+currentDouble.roll)
-            if (!currentDouble || currentDouble.id === undefined || currentDouble.color === undefined || currentDouble.roll === undefined) {
-                console.error("❌ Dados do double inválidos:", currentDouble);
-                return null; // Retorna null se os dados estiverem incompletos ou inválidos
-            }
+            const currentDouble = doubles[0]
             // Verifica se já existe o double_id para evitar duplicações
-            const existingDouble = await DoublesModel.findByDoubleId(currentDouble.id);
+            const lastDouble = await DoublesModel.findByDoubleId(currentDouble.id);
+            if (lastDouble !== currentDouble.id) {
 
-            if (!existingDouble) {
-                // Se o double_id não existir (findByDoubleId retorna null), execute o que for necessário
-                console.log(`✅ Double ID ${currentDouble.id} não existe. Prosseguindo...`);
-                            // Formata a data e hora para um formato mais legível
-            try {
-                switch (currentDouble.color) {
+                let color = parseInt(currentDouble.color)
+                switch (color) {
                     case 0:
                         //await DoublesModel.updateStats(0);
                         console.log(`🎰 Double ID: ${currentDouble.id} | Cor: ⬜ | Roll: ${currentDouble.roll} | Hora: ${currentDouble.created_at}`);
@@ -134,10 +121,7 @@ class BlazeService {
                         break;
         
                 }
-                
-            } catch (error) {
-                console.error('Erro ao formatar dados:', error);
-            }
+
 
 
             // Processa as estratégias após inserir o double
@@ -147,12 +131,9 @@ class BlazeService {
                 console.error("❌ Erro ao processar estratégias:", strategyError);
                 return null; // Retorna null em caso de erro ao processar estratégias
             }
-    
-            return doubles;  // Retorna os doubles (agora armazenados no banco)
-
 
             }else{
-                console.log(existingDouble)
+                //console.log(existingDouble)
                 return null; // Saímos imediatamente se o double_id já existir
             }
 
@@ -205,7 +186,7 @@ class BlazeService {
             } catch (error) {
                 //console.error("❌ Erro durante a verificação periódica:", error);
             }
-        }, 2000); // Intervalo de 5 segundos
+        }, 3000); // Intervalo de 5 segundos
     }
     async atualizarMetasParaUsuarios(userId){
         try {
