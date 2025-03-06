@@ -10,7 +10,7 @@ const db = require('./config/db'); // Conexão com MySQL
 const routes = require('./routes'); // Importando as rotas organizadas
 const app = express();
 const sessionStore = new MySQLStore({}, db);
-
+const port = 3001; // ou qualquer outra porta
 // 🔹 Configurar Middleware
 function setupMiddleware(app) {
     app.set('view engine', 'ejs');
@@ -50,6 +50,9 @@ function setupRoutes(app) {
 function startServer() {
     setupMiddleware(app);
     setupRoutes(app);
+    app.listen(3001, () => {
+      console.log(`Servidor Node.js rodando na porta ${port}`);
+    });
 }
 
 startServer();
