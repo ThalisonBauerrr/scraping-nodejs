@@ -4,22 +4,35 @@ class DoublesModel {
     // 🔹 Insere um novo double no banco com o campo roll
     static async insert(data) {
         const sql = 'INSERT INTO doubles (double_id, color, roll, created_at) VALUES (?, ?, ?, NOW())';
-        
+    
         try {
-            // Aqui, incluímos o campo `roll` no insert
+            // Tenta inserir os dados. Se o double_id já existir, o banco irá gerar um erro.
             await db.execute(sql, [data.double_id, data.color, data.roll]);
+            //console.log("✅ Novo double inserido com sucesso!");
         } catch (error) {
-            console.error("❌ Erro ao inserir o double:", error);
-            throw error;
+            // Caso o erro seja de duplicação (MySQL: ER_DUP_ENTRY), trata como erro de duplicação
+            if (error.code === 'ER_DUP_ENTRY') {
+                //console.log("❌ Double ID já existe!");
+            } else {
+                console.error("❌ Erro ao inserir o double:", error);
+                throw error;
+            }
         }
     }
     // 🔹 Busca os doubles pelo ID
     static async findByDoubleId(doubleId) {
-        const sql = 'SELECT * FROM doubles WHERE double_id = ?';
+        const sql = 'SELECT * FROM doubles ORDER BY id DESC LIMIT 1'; // Pegando o último registro com base no ID
         
         try {
-            const [rows] = await db.execute(sql, [doubleId]);
-            return rows.length > 0 ? rows[0] : null;
+            const [rows] = await db.execute(sql);
+            
+            // Verifica se o último registro tem o double_id igual ao passado
+            if (rows.length > 0 && rows[0].double_id === doubleId) {
+                return rows[0]; // Retorna o registro se os double_ids coincidirem
+            }
+            
+            // Se não encontrar o registro ou o double_id não coincidir, retorna null
+            return null;
         } catch (error) {
             console.error("❌ Erro ao buscar double por ID:", error);
             throw error;
@@ -47,8 +60,7 @@ class DoublesModel {
             console.error("❌ Erro ao obter os últimos doubles:", error);
             throw error;
         }
-    }
-    
+    }    
     // 🔹 Retorna os últimos doubles registrados
     static async getAll() {
         const sql = 'SELECT * FROM doubles ORDER BY created_at DESC LIMIT 15'; // Os 15 últimos doubles
@@ -74,86 +86,76 @@ class DoublesModel {
     }
     // Função para atualizar as estatísticas com base na cor sorteada
     static async updateStats(colorSorteada) {
-        const today = new Intl.DateTimeFormat('pt-BR', {
-            timeZone: 'America/Sao_Paulo', // Fuso horário de Brasília
-            year: 'numeric',
-            month: '2-digit',
-            day: '2-digit',
-          }).format(new Date()).split('/').reverse().join('-'); // Converte para o formato 'yyyy-mm-dd'
-          
-    
         try {
-            // Chama a função findByDate para buscar as estatísticas do dia
-            const stats = await this.findByDate(today);
+            // Busca o último registro
+            const stats = await db.query(
+                `SELECT * FROM round_stats ORDER BY id DESC LIMIT 1`
+            );
 
-            if (stats && stats.length > 0) {
-                // Caso haja um registro, atualiza as estatísticas
-                const currentStats = stats[0]; // Pegue o primeiro registro, já que é por data
+           // Se houver registros, fazemos a atualização
+                const currentStats = stats[0]; // O objeto que contém as estatísticas
 
                 // Variáveis para os contadores
                 let updatedStats = {
-                    no_white: currentStats.no_white,
-                    no_red: currentStats.no_red,
-                    no_black: currentStats.no_black
+                    no_white: currentStats[0].no_white,
+                    no_red: currentStats[0].no_red,
+                    no_black: currentStats[0].no_black
                 };
-
-                // Se a cor sorteada for branco (0), zera o contador de branco e incrementa as outras cores
-                if (colorSorteada === 0) {
-                    updatedStats.no_white = 0;  // Zera o contador de branco
-                    updatedStats.no_red = currentStats.no_red + 1;  // Incrementa o contador de vermelho
-                    updatedStats.no_black = currentStats.no_black + 1;  // Incrementa o contador de preto
-                } 
-                // Se a cor sorteada for vermelho (1), zera o contador de vermelho e incrementa as outras cores
-                else if (colorSorteada === 1) {
-                    updatedStats.no_white = currentStats.no_white + 1;  // Incrementa o contador de branco
-                    updatedStats.no_red = 0;  // Zera o contador de vermelho
-                    updatedStats.no_black = currentStats.no_black + 1;  // Incrementa o contador de preto
-                } 
-                // Se a cor sorteada for preto (2), zera o contador de preto e incrementa as outras cores
-                else if (colorSorteada === 2) {
-                    updatedStats.no_white = currentStats.no_white + 1;  // Incrementa o contador de branco
-                    updatedStats.no_red = currentStats.no_red + 1;  // Incrementa o contador de vermelho
-                    updatedStats.no_black = 0;  // Zera o contador de preto
+    
+                // Lógica de atualização de acordo com a cor sorteada
+                switch (colorSorteada) {
+                    case 0: // Branco
+                        updatedStats.no_white = 0;  // Zera o contador de branco
+                        updatedStats.no_red = currentStats[0].no_red + 1;  // Incrementa o contador de vermelho
+                        updatedStats.no_black = currentStats[0].no_black + 1;  // Incrementa o contador de preto
+                        break;
+    
+                    case 1: // Vermelho
+                        updatedStats.no_white = currentStats[0].no_white + 1;  // Incrementa o contador de branco
+                        updatedStats.no_red = 0;  // Zera o contador de vermelho
+                        updatedStats.no_black = currentStats[0].no_black + 1;  // Incrementa o contador de preto
+                        break;
+    
+                    case 2: // Preto
+                        updatedStats.no_white = currentStats[0].no_white + 1;  // Incrementa o contador de branco
+                        updatedStats.no_red = currentStats[0].no_red + 1;  // Incrementa o contador de vermelho
+                        updatedStats.no_black = 0;  // Zera o contador de preto
+                        break;
                 }
-
+    
+                // Log para verificação dos valores calculados
+                //console.log("Valores calculados:", updatedStats);
+    
+                // Verificar se algum valor é NaN e, se for, corrigir antes de atualizar o banco
+                if (isNaN(updatedStats.no_white) || isNaN(updatedStats.no_red) || isNaN(updatedStats.no_black)) {
+                    console.error("❌ Erro: Um ou mais valores de contadores são inválidos.");
+                    return;
+                }
+    
                 // Atualiza o banco de dados com os novos valores
                 await db.query(
                     `UPDATE round_stats SET 
                         no_white = ?, 
                         no_red = ?, 
                         no_black = ? 
-                    WHERE DATE(timestamp) = ?`, // Usando '?' para parâmetros no MySQL
+                    WHERE id = ?`, // Usando 'id' para identificar o último registro
                     [
                         updatedStats.no_white,
                         updatedStats.no_red,
                         updatedStats.no_black,
-                        today // Data no formato adequado para 'timestamp'
+                        currentStats[0].id // ID do último registro
                     ]
                 );
-
-                //console.log(`✅ Estatísticas do dia (${today}) atualizadas com sucesso`);
-            } else {
-                // Caso não haja registro para a data, insere um novo
-                console.log(`❌ Nenhum registro encontrado para o dia (${today}), criando um novo...`);
-
-                await db.query(
-                    `INSERT INTO round_stats (id, timestamp, no_white, no_red, no_black) 
-                    VALUES (?, ?, ?, ?, ?)`,
-                    [
-                        null, // id_double, pode ser nulo ou o valor apropriado
-                        today, // data do registro
-                        (colorSorteada === 0 ? 0 : 1), // Se sorteado branco, inicia com 0
-                        (colorSorteada === 1 ? 0 : 1), // Se sorteado vermelho, inicia com 0
-                        (colorSorteada === 2 ? 0 : 1)  // Se sorteado preto, inicia com 0
-                    ]
-                );
-
-                console.log(`✅ Novo registro de estatísticas inserido para o dia (${today})`);
-            }
+    
+            console.log(`✅ Último registro atualizado com sucesso`);
+           
         } catch (error) {
-            console.error("❌ Erro ao atualizar/inserir estatísticas:", error);
-            throw new Error("Erro ao atualizar ou inserir as estatísticas.");
+            console.error("❌ Erro ao atualizar estatísticas:", error);
+            throw new Error("Erro ao atualizar as estatísticas.");
         }
     }
+    
+    
+    
 }
 module.exports = DoublesModel;

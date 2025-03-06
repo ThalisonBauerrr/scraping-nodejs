@@ -95,15 +95,15 @@ class BlazeAuth {
                     console.warn(`⚠ Tentativa ${attempt} falhou com status ${response.status}.`);
                 }
             } catch (error) {
-                //console.error(`❌ Erro na tentativa ${attempt}:`, error.response ? error.response.data : error.message);
+                console.error(`❌ Erro na tentativa ${attempt}:`, error.response ? error.response.data : error.message);
     
                 // Se o erro for 502 (Bad Gateway), tente novamente com intervalo maior
                 if (error.response && error.response.status === 502) {
-                    //console.warn("⚠ Erro 502: O servidor da Blaze não está disponível no momento.");
+                    console.warn("⚠ Erro 502: O servidor da Blaze não está disponível no momento.");
                 }
     
                 if (attempt < retries) {
-                    //console.log(`🔄 Tentando novamente em 10 segundos...`);
+                    console.log(`🔄 Tentando novamente em 10 segundos...`);
                     await new Promise(resolve => setTimeout(resolve, 1500)); // Aumentei o intervalo para 10 segundos
                 } else {
                     throw new Error("❌ Falha ao obter últimos doubles após várias tentativas.");
@@ -131,42 +131,52 @@ class BlazeAuth {
         }
     }
     // 🔹 Método para obter o status da requisição diretamente
-    async getStatus() {
+    async getStatus(retries = 10) {
         this._ensureAuthenticated();
     
-        try {
-            const response = await this.session.get('/singleplayer-originals/originals/roulette_games/current/1', {
-                headers: { 'Authorization': `Bearer ${this.token}` }
-            });
+        let attempt = 1;
     
-            // Verifica o status da resposta
-            if (response.status === 200) {
-                const statusDouble = response.data.status;
-                //console.log(`✅ Status da requisição: ${statusDouble}`);
-                return statusDouble; // Retorna o status do double (ex: "waiting", "started")
-            } else {
-                // Trata outros códigos de status HTTP
-                //console.error(`❌ Erro ao pegar status. Status: ${response.status}`);
-                throw new Error(`Erro ao pegar status. Código: ${response.status}`);
+        while (attempt <= retries) {
+            try {
+                const response = await this.session.get('/singleplayer-originals/originals/roulette_games/current/1', {
+                    headers: { 'Authorization': `Bearer ${this.token}` }
+                });
+    
+                // Verifica o status da resposta
+                if (response.status === 200) {
+                    const statusDouble = response.data.status;
+                    return statusDouble; // Retorna o status do double (ex: "waiting", "started")
+                } else {
+                    console.warn(`⚠ Tentativa ${attempt} falhou com status ${response.status}.`);
+                }
+            } catch (error) {
+                console.error(`❌ Erro na tentativa ${attempt}`);
+    
+                // Se o erro for 502 (Bad Gateway) ou 503 (Service Unavailable), tente novamente com intervalo maior
+                if (error.response) {
+                    const statusCode = error.response.status;
+                    if (statusCode === 502) {
+                        console.warn("⚠ Erro 502: O servidor da Blaze não está disponível no momento.");
+                    } else if (statusCode === 503) {
+                        console.warn("⚠ Erro 503: O servidor está temporariamente indisponível.");
+                    }
+                }
+    
+                // Backoff exponencial (dobrando o intervalo a cada falha)
+                const waitTime = Math.pow(2, attempt) * 1000; // 2^attempt segundos
+                console.log(`⏳ Tentativa ${attempt} falhou. Tentando novamente em ${waitTime / 1000} segundos...`);
+    
+                if (attempt < retries) {
+                    await new Promise(resolve => setTimeout(resolve, waitTime)); // Aguarda antes de tentar novamente
+                } else {
+                    throw new Error("❌ Falha ao obter status após várias tentativas.");
+                }
             }
     
-        } catch (error) {
-            // Trata erros específicos
-            if (error.response) {
-                // Erro de resposta da API (ex: 502 Bad Gateway)
-                //console.error(`❌ Erro na resposta da API: ${error.response.status} - ${error.response.statusText}`);
-                throw new Error(`Erro na resposta da API: ${error.response.status}`);
-            } else if (error.request) {
-                // Erro de rede (ex: sem resposta do servidor)
-                //console.error('❌ Erro de rede: Não foi possível conectar ao servidor.');
-                throw new Error('Erro de rede: Não foi possível conectar ao servidor.');
-            } else {
-                // Outros erros (ex: erro no código)
-                //console.error('❌ Erro ao processar a requisição:', error.message);
-                throw error;
-            }
+            attempt++;
         }
     }
+    
     // 🔹 Método para fazer uma aposta (POST)
     async placeBets(amount, color, username, walletId, roomId) {
         this._ensureAuthenticated();

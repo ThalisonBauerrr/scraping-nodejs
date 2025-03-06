@@ -63,9 +63,9 @@ class BlazeService {
             }
 
             // Obtém o status da Blaze
-            const status = await this.auth.getStatus();
+            const status = await this.blazeAuth.getStatus();
 
-           // console.log(`✅ Status Atual da Blaze: ${status || "Erro ao obter status"}`);
+           //console.log(`✅ Status Atual da Blaze: ${status || "Erro ao obter status"}`);
 
             // Se o status for "waiting", retorna true
             if (status === "complete") {
@@ -76,58 +76,93 @@ class BlazeService {
             return false; // Retorna false se o status não for "waiting"
 
         } catch (error) {
-            //console.error("❌ Erro ao verificar status da Blaze:", error);
+            console.error("❌ Erro ao verificar status da Blaze:", error);
             throw error;
         }
     }
     // 🔹 Função para obter os últimos doubles e salvar no banco de dados
+    async insertDouble(currentDouble) {
+        // Insere o novo double no banco de dados
+        try {
+            await DoublesModel.insert({
+                double_id: currentDouble.id,
+                color: currentDouble.color,
+                roll: currentDouble.roll
+            });
+        } catch (insertError) {
+            console.error("❌ Erro ao inserir o double no banco de dados:", insertError);
+            return null; // Retorna null em caso de erro na inserção
+        }
+    }
     async getDoubles() {
         try {
-            const doubles = await this.auth.getLastDoubles(); // Chama a função que já existe para pegar os doubles
+            const doubles = await this.blazeAuth.getLastDoubles(); // Chama a função que já existe para pegar os doubles
+            if (!doubles || doubles.length === 0) {
+                console.log("❌ Nenhum double encontrado.");
+                return null;  // Retorna null se não houver doubles
+            }
     
-            if (doubles && doubles[0]) {
-                const currentDouble = doubles[0];
-    
-                // Verifique se já existe o ID para evitar duplicações
-                const existingDouble = await DoublesModel.findByDoubleId(currentDouble.id);
-                if (!existingDouble) {
-                    // Não associar um user_id ao double, pois ele é universal
-                    await DoublesModel.insert({
-                        double_id: currentDouble.id,
-                        color: currentDouble.color,
-                        roll: currentDouble.roll  // Aqui está o campo `roll`
-                    });
-    
-                    // Mapeia o valor da cor para um emoji
-                    const colorEmoji = {
-                        0: '⬜', // Branco
-                        1: '🟥', // Vermelho
-                        2: '⬛'  // Preto
-                    };
-    
-                    // Formata a data e hora para um formato mais legível
-                    const formattedDate = new Date(currentDouble.created_at).toLocaleString();
-                    console.log(`🎰 Double ID: ${currentDouble.id} | Cor: ${colorEmoji[currentDouble.color]} | Roll: ${currentDouble.roll} | Hora: ${formattedDate}`);
-    
-                        // Atualiza as estatísticas conforme a cor sorteada
-                        if (currentDouble.color === 0) { // Branco
-                            await DoublesModel.updateStats(0);  // Passando apenas a cor sorteada
-                        } else if (currentDouble.color === 1) { // Vermelho
-                            await DoublesModel.updateStats(1);  // Passando apenas a cor sorteada
-                        } else if (currentDouble.color === 2) { // Preto
-                            await DoublesModel.updateStats(2);  // Passando apenas a cor sorteada
-                        }
-    
-                    await this.processDoublesAndCheckStrategies(currentDouble);
+            const currentDouble = doubles[0];  // Pegando o último double (o primeiro da lista)
+            console.log(currentDouble.id+"   -   "+currentDouble.roll)
+            if (!currentDouble || currentDouble.id === undefined || currentDouble.color === undefined || currentDouble.roll === undefined) {
+                console.error("❌ Dados do double inválidos:", currentDouble);
+                return null; // Retorna null se os dados estiverem incompletos ou inválidos
+            }
+            // Verifica se já existe o double_id para evitar duplicações
+            const existingDouble = await DoublesModel.findByDoubleId(currentDouble.id);
+
+            if (!existingDouble) {
+                // Se o double_id não existir (findByDoubleId retorna null), execute o que for necessário
+                console.log(`✅ Double ID ${currentDouble.id} não existe. Prosseguindo...`);
+                            // Formata a data e hora para um formato mais legível
+            try {
+                switch (currentDouble.color) {
+                    case 0:
+                        //await DoublesModel.updateStats(0);
+                        console.log(`🎰 Double ID: ${currentDouble.id} | Cor: ⬜ | Roll: ${currentDouble.roll} | Hora: ${currentDouble.created_at}`);
+                        await this.insertDouble(currentDouble)
+                        break;
+                    case 1:
+                        //await DoublesModel.updateStats(1);
+                        console.log(`🎰 Double ID: ${currentDouble.id} | Cor: 🟥 | Roll: ${currentDouble.roll} | Hora: ${currentDouble.created_at}`);
+                        await this.insertDouble(currentDouble)
+                        break;
+                    case 2:
+                        //await DoublesModel.updateStats(2);
+                        console.log(`🎰 Double ID: ${currentDouble.id} | Cor: ⬛ | Roll: ${currentDouble.roll} | Hora: ${currentDouble.created_at}`);
+                        await this.insertDouble(currentDouble)
+                        break;
+        
                 }
+                
+            } catch (error) {
+                console.error('Erro ao formatar dados:', error);
+            }
+
+
+            // Processa as estratégias após inserir o double
+            try {
+                //await this.processDoublesAndCheckStrategies(currentDouble);
+            } catch (strategyError) {
+                console.error("❌ Erro ao processar estratégias:", strategyError);
+                return null; // Retorna null em caso de erro ao processar estratégias
             }
     
             return doubles;  // Retorna os doubles (agora armazenados no banco)
+
+
+            }else{
+                console.log(existingDouble)
+                return null; // Saímos imediatamente se o double_id já existir
+            }
+
+
         } catch (error) {
             console.error("❌ Erro ao obter últimos doubles:", error);
-            return null;
+            return null;  // Retorna null em caso de erro na obtenção dos doubles
         }
     }
+    
     // 🔹 Parar a verificação de doubles
     async stopChecking(userId) {
         if (this.intervalId) {
@@ -230,16 +265,30 @@ class BlazeService {
     
             // Pega todos os usuários com estratégia ativa
             const activeUsers = await User.getUsersRunning();
-            
+    
+            if (!activeUsers || activeUsers.length === 0) {
+                console.log("❌ Nenhum usuário com estratégias ativas.");
+                return;
+            }
+    
             // Itera sobre cada usuário ativo e verifica suas estratégias
             for (const user of activeUsers) {
                 if (!user || !user.id) {
                     console.log(`❌ Usuário não encontrado ou id não definido.`);
                     continue;
                 }
-                await User.atualizarMetaDiaria(user.id);
+    
+                try {
+                    // Atualiza a meta diária do usuário
+                    await User.atualizarMetaDiaria(user.id);
+                } catch (userUpdateError) {
+                    console.error(`❌ Erro ao atualizar a meta diária para o usuário ${user.email}:`, userUpdateError);
+                    continue; // Continua com o próximo usuário em caso de erro
+                }
+    
                 // Encontre todas as estratégias ativas do usuário
                 const activeStrategies = await Strategy.findActiveStrategies(user.id); // Atualizado para buscar várias estratégias
+    
                 if (!activeStrategies || activeStrategies.length === 0) {
                     console.log(`❌ Nenhuma estratégia ativa para o usuário: ${user.email}`);
     
@@ -248,8 +297,8 @@ class BlazeService {
                     continue;
                 }
     
-                console.log(`\n ✅ Verificando estratégias para o usuário: ${user.email}`);
-                
+                console.log(`\n✅ Verificando estratégias para o usuário: ${user.email}`);
+    
                 // Itera sobre cada estratégia ativa do usuário
                 for (const activeStrategy of activeStrategies) {
                     // Verifica se a estratégia já está ativa antes de qualquer coisa
@@ -297,7 +346,7 @@ class BlazeService {
                                 await this.processBetResult(user, activeStrategy, currentDouble, activeStrategy.chosen_color, activeStrategy.modo); // Inicia a aposta
                             }
                         }
-                    }else if(strategyMode === 1 || strategyMode === 2){
+                    } else if (strategyMode === 1 || strategyMode === 2) {
                         // No modo 1, o campo sequence é uma string com o número de rodadas sem branco
                         const currentStats = await DoublesModel.findByDate(new Date().toISOString().split('T')[0]); // Obtém as estatísticas do dia
                         const no_white = currentStats && currentStats[0] ? currentStats[0].no_white : 0;
@@ -306,19 +355,19 @@ class BlazeService {
                         const requiredRoundsWithoutWhite = parseInt(activeStrategy.sequence, 10);
                         const lastDoubleColor = colorMap[currentDouble.color];
                         // Verifica se a quantidade de rodadas sem branco é maior ou igual ao valor de sequence na estratégia
-                        if(strategyMode === 1){
+                        if (strategyMode === 1) {
                             if (no_white >= requiredRoundsWithoutWhite) {
                                 console.log(`🎲 Número de rodadas sem branco (${no_white}) atingiu a sequência da estratégia: ${user.email} | Estratégia ID: ${activeStrategy.id}`);
-                                
+    
                                 // Marca a estratégia como 'active' para evitar múltiplas apostas ao mesmo tempo
                                 await Strategy.updateBettingStatus(activeStrategy.id, 'active');
                                 await this.createBet(user, activeStrategy, currentDouble, activeStrategy.bet_amount, activeStrategy.chosen_color, activeStrategy.modo);
                                 await this.processBetResult(user, activeStrategy, currentDouble, activeStrategy.chosen_color, activeStrategy.modo); // Inicia a aposta
                             }
-                        }else if(strategyMode === 2){
-                            if (no_white >= requiredRoundsWithoutWhite && lastDoubleColor === "white" ) {
+                        } else if (strategyMode === 2) {
+                            if (no_white >= requiredRoundsWithoutWhite && lastDoubleColor === "white") {
                                 console.log(`🎲 Número de rodadas sem branco (${no_white}) atingiu a sequência da estratégia: ${user.email} | Estratégia ID: ${activeStrategy.id}`);
-                                
+    
                                 // Marca a estratégia como 'active' para evitar múltiplas apostas ao mesmo tempo
                                 await Strategy.updateBettingStatus(activeStrategy.id, 'active');
                                 await this.createBet(user, activeStrategy, currentDouble, activeStrategy.bet_amount, activeStrategy.chosen_color, activeStrategy.modo);
@@ -330,8 +379,10 @@ class BlazeService {
             }
         } catch (error) {
             console.error("❌ Erro ao processar doubles e verificar estratégias:", error);
+            // Retorna ou repropaga o erro conforme necessário
         }
     }
+    
     // Função para calcular a aposta no Martingale com 4% de lucro sobre o valor investido
     async calcularApostaPorIndice(lucroDesejado, indice) {
         let perdaAcumulada = 0;
