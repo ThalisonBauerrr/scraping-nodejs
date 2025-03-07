@@ -39,8 +39,8 @@ h1 {
 
 /* Estilo para o logo */
 .logo {
-    max-width: 400px; /* Tamanho máximo do logo */
-    max-height: 200px;
+    max-width: 300px; /* Ajustando o tamanho do logo */
+    max-height: 150px;
     margin-bottom: 30px;
     animation: fadeInLogo 2s ease-out;
 }
@@ -69,6 +69,7 @@ h1 {
     transition: all 0.3s ease;
     text-transform: uppercase;
     font-weight: bold;
+    margin-top: 20px; /* Ajusta o espaço entre o botão e o logo */
 }
 
 /* Efeito de hover no botão CTA */
