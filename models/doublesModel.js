@@ -20,21 +20,21 @@ class DoublesModel {
         }
     }
     // 🔹 Busca os doubles pelo ID
-    static async findByDoubleId() {
-        const sql = 'SELECT double_id FROM doubles ORDER BY id DESC LIMIT 1'; // Pegando o último ID
+    static async findByDoubleId(doubleId) {
+        const sql = 'SELECT double_id FROM doubles WHERE double_id = ? LIMIT 1'; // Verifica se o double_id já existe
         
         try {
-            const [rows] = await db.execute(sql);
+            const [rows] = await db.execute(sql, [doubleId]);
             
-            // Verifica se algum registro foi encontrado
+            // Verifica se o double_id foi encontrado
             if (rows.length > 0) {
-                return rows[0].double_id; // Retorna o último id encontrado
+                return true; // O double_id já existe
             }
             
-            // Se não encontrar nenhum registro, retorna null
-            return null;
+            // Se não encontrar o double_id, retorna false
+            return false;
         } catch (error) {
-            console.error("❌ Erro ao buscar o último ID:", error);
+            console.error("❌ Erro ao verificar se o double_id existe:", error);
             throw error;
         }
     }
@@ -74,11 +74,13 @@ class DoublesModel {
         }
     }
     // Função que encontra as estatísticas do dia
-    static async findByDate(date) {
+    static async findByDate() {
         try {
-            // Usando '?' como marcador de parâmetro para o MySQL
-            const [rows] = await db.query('SELECT * FROM round_stats WHERE DATE(timestamp) = ?', [date]);
-            return rows;
+            // Usando '?' como marcador de parâmetro para o MySQL, embora não seja necessário aqui
+            const [rows] = await db.query('SELECT * FROM round_stats ORDER BY id DESC LIMIT 1');
+    
+            // Se houver resultados, retorna o primeiro item, senão retorna null
+            return rows.length > 0 ? rows[0] : null;  // Retorna o último registro ou null se não houver resultados
         } catch (error) {
             console.error("Erro ao consultar round_stats:", error);
             throw new Error("Erro ao consultar as estatísticas.");
@@ -147,7 +149,7 @@ class DoublesModel {
                     ]
                 );
     
-            console.log(`✅ Último registro atualizado com sucesso`);
+            //console.log(`✅ Último registro atualizado com sucesso`);
            
         } catch (error) {
             console.error("❌ Erro ao atualizar estatísticas:", error);

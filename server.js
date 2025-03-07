@@ -33,9 +33,6 @@ function startServer() {
         await Strategy.updateBettingStatusSEMWHERE('inactive');
         // Chama o método para garantir que o processo de verificação dos doubles inicie
         await BlazeService.startChecking();  // Inicia a verificação dos doubles a cada 5 segundos
-        // Retoma a verificação de sessões ativas para os usuários com is_running = 1
-        await BlazeService.resumeActiveSessions();
-
         // Agendar o cron job para rodar todos os dias às 00:00
         cron.schedule('0 0 * * *', async () => {
             console.log('Executando atualização de status dos usuários...');

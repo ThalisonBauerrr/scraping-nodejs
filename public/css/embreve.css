@@ -5,7 +5,7 @@
     box-sizing: border-box;
 }
 
-/* Define o estilo da página com fundo branco e texto centralizado */
+/* Define o estilo da página com fundo escuro e texto centralizado */
 body {
     background-color: #0f1923;
     height: 100vh; /* A altura ocupa toda a tela */
@@ -14,6 +14,7 @@ body {
     justify-content: center; /* Centraliza verticalmente */
     align-items: center; /* Centraliza horizontalmente */
     text-align: center;
+    font-family: 'Montserrat', sans-serif; /* Fonte limpa e moderna */
 }
 
 /* Estilo do título "EM BREVE" */
@@ -21,10 +22,62 @@ h1 {
     font-size: 4rem;
     color: #7c7b7b;
     margin-bottom: 20px;
+    animation: fadeIn 2s ease-out;
+}
+
+/* Animação do título */
+@keyframes fadeIn {
+    0% {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+    100% {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
 /* Estilo para o logo */
 .logo {
     max-width: 400px; /* Tamanho máximo do logo */
     max-height: 200px;
+    margin-bottom: 30px;
+    animation: fadeInLogo 2s ease-out;
+}
+
+/* Animação para o logo */
+@keyframes fadeInLogo {
+    0% {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+    100% {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Estilo do botão CTA */
+.cta-button {
+    padding: 15px 30px;
+    background-color: #ff3d00;
+    color: #fff;
+    font-size: 1.2em;
+    border: none;
+    border-radius: 25px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-transform: uppercase;
+    font-weight: bold;
+}
+
+/* Efeito de hover no botão CTA */
+.cta-button:hover {
+    background-color: #e53900;
+    transform: scale(1.1);
+}
+
+/* Efeito de clique no botão CTA */
+.cta-button:active {
+    transform: scale(1);
 }

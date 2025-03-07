@@ -68,7 +68,7 @@ class BlazeService {
            //console.log(`✅ Status Atual da Blaze: ${status || "Erro ao obter status"}`);
 
             // Se o status for "waiting", retorna true
-            if (status === "complete") {
+            if (status === process.env.STATUSGET_ROLETA) {
                 //console.log("🔄 Status é 'waiting'. Iniciando verificação dos doubles...");
                 return true;
             }
@@ -100,22 +100,22 @@ class BlazeService {
             const currentDouble = doubles[0]
             // Verifica se já existe o double_id para evitar duplicações
             const lastDouble = await DoublesModel.findByDoubleId(currentDouble.id);
-            if (lastDouble !== currentDouble.id) {
 
+            if (!lastDouble) {
                 let color = parseInt(currentDouble.color)
                 switch (color) {
                     case 0:
-                        //await DoublesModel.updateStats(0);
+                        await DoublesModel.updateStats(0);
                         console.log(`🎰 Double ID: ${currentDouble.id} | Cor: ⬜ | Roll: ${currentDouble.roll} | Hora: ${currentDouble.created_at}`);
                         await this.insertDouble(currentDouble)
                         break;
                     case 1:
-                        //await DoublesModel.updateStats(1);
+                        await DoublesModel.updateStats(1);
                         console.log(`🎰 Double ID: ${currentDouble.id} | Cor: 🟥 | Roll: ${currentDouble.roll} | Hora: ${currentDouble.created_at}`);
                         await this.insertDouble(currentDouble)
                         break;
                     case 2:
-                        //await DoublesModel.updateStats(2);
+                        await DoublesModel.updateStats(2);
                         console.log(`🎰 Double ID: ${currentDouble.id} | Cor: ⬛ | Roll: ${currentDouble.roll} | Hora: ${currentDouble.created_at}`);
                         await this.insertDouble(currentDouble)
                         break;
@@ -126,7 +126,7 @@ class BlazeService {
 
             // Processa as estratégias após inserir o double
             try {
-                //await this.processDoublesAndCheckStrategies(currentDouble);
+                await this.processDoublesAndCheckStrategies(currentDouble);
             } catch (strategyError) {
                 console.error("❌ Erro ao processar estratégias:", strategyError);
                 return null; // Retorna null em caso de erro ao processar estratégias
@@ -143,7 +143,7 @@ class BlazeService {
             return null;  // Retorna null em caso de erro na obtenção dos doubles
         }
     }
-    
+
     // 🔹 Parar a verificação de doubles
     async stopChecking(userId) {
         if (this.intervalId) {
@@ -158,36 +158,57 @@ class BlazeService {
     }
     // 🔹 Método para iniciar a verificação periódica dos doubles
     async startChecking() {
+        // Verifica se está autenticado, se não estiver, tenta fazer login
         if (!this.isLoggedIn || !this.auth || !this.auth.token) {
-            //console.error("❌ Usuário não autenticado na Blaze. Tentando login novamente...");
             try {
+                // Tentativa de login
                 await this.login(process.env.API_USERNAME, process.env.API_PASSWORD);
-                console.log("💻 Logado com a conta do servidor")
+                console.log("\n💻 Logado com a conta do servidor");
+    
+                // Resume as sessões ativas
+                await this.resumeActiveSessions();
+    
+                // Após o login, começa a verificar doubles
+                await this.startDoublesChecking();
+    
             } catch (error) {
                 console.error("❌ Erro ao tentar relogar na Blaze:", error);
-                return null; // Evita crash caso o login falhe
+                return; // Termina a execução se o login falhar
             }
+        } else {
+            // Se já está autenticado, iniciar a verificação de doubles diretamente
+            await this.startDoublesChecking();
         }
+    }
+    // Função que inicia a verificação dos doubles
+    async startDoublesChecking() {
+        // Verifica se já está verificando os doubles, se sim, não faz nada
         if (this.isCheckingDoubles) {
-            return;
+            return; // Se já estiver verificando doubles, sai da função
         }
+    
+        // Marca que estamos verificando doubles
         this.isCheckingDoubles = true;
+    
+        // Configura o intervalo para pegar doubles
         this.intervalId = setInterval(async () => {
             try {
-
+                // Verifica o status da roleta
                 const isWaiting = await this.getStatusRoletta();
-
+    
                 if (isWaiting) {
-                    await this.getDoubles(); 
+                    // Se estiver esperando, faz a busca de doubles
+                    await this.getDoubles();
                 } else {
+                    // Caso o status não seja 'waiting', apenas ignora
                     //console.log("⏸ Status não é 'waiting'. Ignorando busca de doubles...");
                 }
-
             } catch (error) {
-                //console.error("❌ Erro durante a verificação periódica:", error);
+                console.error("❌ Erro durante a verificação periódica:", error);
             }
-        }, 3000); // Intervalo de 5 segundos
+        }, process.env.INTERVALOGET_DOUBLE); // Intervalo para as verificações
     }
+
     async atualizarMetasParaUsuarios(userId){
         try {
             const infoUser = await this.getUserInfo()
@@ -201,30 +222,20 @@ class BlazeService {
     };
     // 🔹Retomando verificações de usuários ativos...
     async resumeActiveSessions() {
-        console.log("🔄 Retomando verificações de usuários ativos...");
+        console.log("\n🔄 Retomando verificações de usuários ativos...");
 
         try {
             const activeUsers = await User.getUsersRunning(); // Obtém os usuários com is_running = 1
 
             for (let user of activeUsers) {
                 console.log(`✅ Retomando verificação para: ${user.email}`);
-                await this.startChecking(user.email, user.id); // Retoma a verificação para cada usuário ativo
+                await this.startChecking(); // Retoma a verificação para cada usuário ativo
                 await this.atualizarMetasParaUsuarios(user.id);
             }
 
         } catch (error) {
             console.error("❌ Erro ao retomar sessões ativas:", error);
         }
-    }
-    // 🔹 Função chamada ao iniciar o servidor para garantir que os doubles sejam processados e as estratégias verificadas
-    async initializeOnServerStart() {
-        console.log("🚀 Iniciando o processo de verificação dos doubles e das estratégias...");
-
-        // Inicia o processo de verificação contínua de doubles
-        await this.startChecking();
-
-        // Retoma as sessões de usuários ativos
-        await this.resumeActiveSessions();
     }
     // 🔹 Função para processar os doubles e verificar as estratégias
     async processDoublesAndCheckStrategies(currentDouble) {
@@ -278,14 +289,14 @@ class BlazeService {
                     continue;
                 }
     
-                console.log(`\n✅ Verificando estratégias para o usuário: ${user.email}`);
+                //console.log(`\n✅ Verificando estratégias para o usuário: ${user.email}`);
     
-                // Itera sobre cada estratégia ativa do usuário
+                // Itera sobre cada estratégia ativa do usuárioEstratégia já ativa para o usuário
                 for (const activeStrategy of activeStrategies) {
                     // Verifica se a estratégia já está ativa antes de qualquer coisa
                     if (activeStrategy.betting_status === 'active') {
                         // Se a estratégia já está ativa, processa o resultado sem fazer nova aposta
-                        console.log(`🔄 Estratégia já ativa para o usuário: ${user.email}`);
+                        //console.log(`🔄 Estratégia já ativa para o usuário: ${user.email}`);
                         await this.processBetResult(user, activeStrategy, currentDouble, activeStrategy.chosen_color, activeStrategy.modo);
                         continue; // Pula o restante do processamento
                     }
@@ -329,7 +340,7 @@ class BlazeService {
                         }
                     } else if (strategyMode === 1 || strategyMode === 2) {
                         // No modo 1, o campo sequence é uma string com o número de rodadas sem branco
-                        const currentStats = await DoublesModel.findByDate(new Date().toISOString().split('T')[0]); // Obtém as estatísticas do dia
+                        const currentStats = await DoublesModel.findByDate();
                         const no_white = currentStats && currentStats[0] ? currentStats[0].no_white : 0;
     
                         // Converte a string 'sequence' para número inteiro
@@ -446,7 +457,8 @@ class BlazeService {
             }
     
             if (betResults.length > 0) {
-                console.log(`🎰 Aposta realizada com sucesso para o usuário ${userId}! | Valor: ${amount} 💰`);
+                const parsedAmount = parseFloat(amount);
+                console.log(`🎰 Aposta realizada com sucesso para o usuário ${userId}! | Valor: ${parsedAmount.toFixed(3)} 💰`);
                 return { success: true, data: betResults };
             } else {
                 console.error(`❌ Falha ao realizar aposta.`);
@@ -479,7 +491,7 @@ class BlazeService {
         }
     }
     // Função auxiliar para obter a cor do double
-     getColorFromDouble(colorNumber) {
+    getColorFromDouble(colorNumber) {
         const colorMap = { 0: "white", 1: "red", 2: "black" };
         return colorMap[colorNumber] || "unknown";
     }
@@ -509,13 +521,9 @@ class BlazeService {
                 adjustedBetAmount = await this.calcularApostaMartingale(betAmount, gale, modo);
                 adjustedBetAmount = parseFloat(adjustedBetAmount).toFixed(3); // Garantir que seja um número
             }
-            if (betStatus === "pending") {
-                // Aposta inicial ou aumento de Gale
-                await BetsModel.incrementarGale(betId); // Incrementa o Gale
-                await this.setBet(user.id, adjustedBetAmount, chosenColor); // Faz a aposta
-                await BetsModel.updateBetStatus(betId, "going"); // Atualiza o status da aposta para 'going'
-                    
-            } else if (betStatus === "going") {
+
+
+            if (betStatus === "going") {
                 // Se a aposta foi ganha
                 if (apostaVencedora) {
                     console.log(`\n🏆 Aposta ganha! Cor sorteada: ${lastDoubleColor} → Escolhida: ${colorsArray.join(" ou ")}`);
@@ -541,17 +549,22 @@ class BlazeService {
                         await UserConfig.setUserStatusForStopLoss(user.id, infoUser.balance);
                         
                     } else {
-                        console.log(`⚠️  Aviso: Cor sorteada [${lastDoubleColor}] não corresponde às cores selecionadas: [${colorsArray.join(" ou ")}]`);
+                        console.log(`\n⚠️  Aviso: Cor sorteada [${lastDoubleColor}] não corresponde às cores selecionadas: [${colorsArray.join(" ou ")}]`);
                         const sucesso = await BetsModel.incrementarGale(betId); // Incrementa o Gale na aposta
                         if (sucesso) {
-                            console.log(`🎯 Valor da aposta ajustado: R$ ${adjustedBetAmount} | Gale ➝  ${gale} 💰`);
+                            //console.log(`🎯 Valor da aposta ajustado: R$ ${adjustedBetAmount} | Gale ➝  ${gale} 💰`);
                             await this.setBet(user.id, parseFloat(adjustedBetAmount), chosenColor); // Faz a nova aposta
                         } else {
                             console.log("❌ Não foi possível incrementar o Gale. A aposta não será feita.");
                         }
                     }
                 }
-            } 
+            }else if (betStatus === "pending") {
+                // Aposta inicial ou aumento de Gale
+                await BetsModel.incrementarGale(betId); // Incrementa o Gale
+                await this.setBet(user.id, adjustedBetAmount, chosenColor); // Faz a aposta
+                await BetsModel.updateBetStatus(betId, "going"); // Atualiza o status da aposta para 'going'
+            }
         } catch (error) {
             console.error("❌ Erro ao processar o resultado da aposta:", error);
         }

@@ -18,30 +18,64 @@ class BlazeAuth {
             withCredentials: true
         });
     }
+    // Função para tratar os erros de maneira centralizada
+    async handleError(error, attempt, retries, mensagem) {
+        console.error(`❌ Erro na tentativa ${attempt} na ${mensagem}`);
+
+        // **Erro 400 (Bad Request)**: Solicitação malformada
+        if (error.response && error.response.status === 400) {
+            console.error("⚠ Erro 400: Solicitação malformada. Verifique os parâmetros enviados.");
+        }
+        // **Erro 401 (Unauthorized)**: Credenciais inválidas
+        else if (error.response && error.response.status === 401) {
+            console.error("⚠ Erro 401: Credenciais inválidas. Verifique o nome de usuário e a senha.");
+        }
+        // **Erro 500 (Internal Server Error)**: Problemas no servidor da API
+        else if (error.response && error.response.status === 500) {
+            console.error("⚠ Erro 500: O servidor da API encontrou um erro interno. Tente novamente mais tarde.");
+        }
+        // **Erro de Timeout ou Rede**: Problemas de conexão
+        else if (error.code === 'ECONNABORTED' || error.message.includes('timeout')) {
+            console.error("⚠ Erro de Timeout: A requisição demorou demais para responder.");
+        }
+        // **Outros Erros HTTP**: Outros erros não especificados
+        else if (error.response) {
+            console.error(`❌ Erro inesperado: Status ${error.response.status} - ${error.response.data}`);
+        }
+        // **Erro Desconhecido**: Outros tipos de erro desconhecidos
+        else {
+            console.error(`❌ Erro desconhecido: ${error.message}`);
+        }
+
+        // Se houver tentativas restantes, tenta novamente após um intervalo
+        if (attempt < retries) {
+            console.log(`🔄 Tentando novamente em 5 segundos...`);
+            return new Promise(resolve => setTimeout(resolve, 5000)); // Intervalo de 5 segundos
+        } else {
+            throw new Error("❌ Falha no login após várias tentativas.");
+        }
+    }
     // 🔹 Método para fazer login usando PUT com retry
     async login(retries = 3) {
         for (let attempt = 1; attempt <= retries; attempt++) {
             try {
-                //console.log(`📌 Tentativa ${attempt} de login...`);
+                // Tentativa de login
                 const response = await this.session.put('/auth/password', {
                     username: this.username,
                     password: this.password
                 });
+    
+                // Verifica se a resposta foi bem-sucedida e contém o access_token
                 if (response.status === 200 && response.data.access_token) {
                     this.token = response.data.access_token;
-                    //console.log('✅ Login realizado com sucesso!');
+                    console.log('✅ Login realizado com sucesso!');
                     return this.token;
                 } else {
-                    console.warn('⚠ Resposta inesperada. Estrutura dos dados pode ter mudado.');
+                    console.warn('⚠ Resposta inesperada. Estrutura dos dados pode ter mudado ou o login falhou.');
                 }
             } catch (error) {
-                console.error(`❌ Erro na tentativa ${attempt}:`, error.response ? error.response.data : error.message);
-                if (attempt < retries) {
-                    console.log(`🔄 Tentando novamente em 5 segundos...`);
-                    await new Promise(resolve => setTimeout(resolve, 5000));
-                } else {
-                    throw new Error("❌ Falha no login após várias tentativas.");
-                }
+                // Chama a função handleError para centralizar o tratamento de erros
+                await this.handleError(error, attempt, retries, 'login');
             }
         }
     }
@@ -59,7 +93,6 @@ class BlazeAuth {
         this._ensureAuthenticated();
         return this._makeRequest('/users/me/xp', 'GET', "Erro ao buscar saldo da conta");
     }
-
     // 🔹 Método para obter informações completas do usuário
     async getUserinfo() {
         try {
@@ -82,35 +115,26 @@ class BlazeAuth {
     // 🔹 Método para obter os últimos doubles com retry automático
     async getLastDoubles(retries = 10) {
         this._ensureAuthenticated();
-    
+
         for (let attempt = 1; attempt <= retries; attempt++) {
             try {
                 const response = await this.session.get('/singleplayer-originals/originals/roulette_games/recent/1', {
                     headers: { 'Authorization': `Bearer ${this.token}` }
                 });
-    
+
+                // Verifica se a resposta foi bem-sucedida
                 if (response.status === 200) {
                     return response.data;
                 } else {
                     console.warn(`⚠ Tentativa ${attempt} falhou com status ${response.status}.`);
                 }
             } catch (error) {
-                console.error(`❌ Erro na tentativa ${attempt}:`, error.response ? error.response.data : error.message);
-    
-                // Se o erro for 502 (Bad Gateway), tente novamente com intervalo maior
-                if (error.response && error.response.status === 502) {
-                    console.warn("⚠ Erro 502: O servidor da Blaze não está disponível no momento.");
-                }
-    
-                if (attempt < retries) {
-                    console.log(`🔄 Tentando novamente em 10 segundos...`);
-                    await new Promise(resolve => setTimeout(resolve, 1500)); // Aumentei o intervalo para 10 segundos
-                } else {
-                    throw new Error("❌ Falha ao obter últimos doubles após várias tentativas.");
-                }
+                // Chama a função handleError para centralizar o tratamento de erros
+                await this.handleError(error, attempt, retries, 'getLastDoubles');
             }
         }
     }
+        
     // 🔹 Método genérico para fazer requisições autenticadas com melhor tratamento de erros
     async _makeRequest(endpoint, method = 'GET', errorMessage = "Erro na requisição") {
         try {
@@ -142,35 +166,14 @@ class BlazeAuth {
                     headers: { 'Authorization': `Bearer ${this.token}` }
                 });
     
-                // Verifica o status da resposta
+                // Verifica se a resposta foi bem-sucedida
                 if (response.status === 200) {
                     const statusDouble = response.data.status;
                     return statusDouble; // Retorna o status do double (ex: "waiting", "started")
-                } else {
-                    console.warn(`⚠ Tentativa ${attempt} falhou com status ${response.status}.`);
                 }
             } catch (error) {
-                console.error(`❌ Erro na tentativa ${attempt}`);
-    
-                // Se o erro for 502 (Bad Gateway) ou 503 (Service Unavailable), tente novamente com intervalo maior
-                if (error.response) {
-                    const statusCode = error.response.status;
-                    if (statusCode === 502) {
-                        console.warn("⚠ Erro 502: O servidor da Blaze não está disponível no momento.");
-                    } else if (statusCode === 503) {
-                        console.warn("⚠ Erro 503: O servidor está temporariamente indisponível.");
-                    }
-                }
-    
-                // Backoff exponencial (dobrando o intervalo a cada falha)
-                const waitTime = Math.pow(2, attempt) * 1000; // 2^attempt segundos
-                console.log(`⏳ Tentativa ${attempt} falhou. Tentando novamente em ${waitTime / 1000} segundos...`);
-    
-                if (attempt < retries) {
-                    await new Promise(resolve => setTimeout(resolve, waitTime)); // Aguarda antes de tentar novamente
-                } else {
-                    throw new Error("❌ Falha ao obter status após várias tentativas.");
-                }
+                // Chama a função handleError para centralizar o tratamento de erros
+                await this.handleError(error, attempt, retries, 'getStatus');
             }
     
             attempt++;
